@@ -1,5 +1,5 @@
 import type { AddressTruthReport, ReportModule } from "@/lib/domain/analysis";
-import { formatJourneyCadence, formatWeeklyBurden, reportVerdict } from "@/lib/report/presentation";
+import { formatJourneyCadence, formatWeeklyBurden, reportVerdict, routineFitBreakdown, weeklyBurdenBreakdown } from "@/lib/report/presentation";
 import { transportSetupMessage } from "@/lib/report/transport-status";
 
 function moduleMessage(module: ReportModule) {
@@ -10,6 +10,8 @@ function moduleMessage(module: ReportModule) {
 export function AnalysisReport({ report, onEdit, onOpenDemo, demo = false }: { report: AddressTruthReport; onEdit: () => void; onOpenDemo?: () => void; demo?: boolean }) {
   const transportMessage = moduleMessage(report.modules.transport);
   const setupMessage = transportSetupMessage(report);
+  const fitBreakdown = routineFitBreakdown(report);
+  const burdenBreakdown = weeklyBurdenBreakdown(report);
   const unavailableModules = [
     ["TimeLens", report.modules.timeLens],
     ["ShadowCommute", report.modules.shadowCommute],
@@ -63,6 +65,26 @@ export function AnalysisReport({ report, onEdit, onOpenDemo, demo = false }: { r
         <p className="mt-2 font-medium leading-6">{reportVerdict(report)}</p>
         <p className="mt-2 text-sm leading-6 text-muted-ink">Routine Fit compares each regular journey with the travel limit you chose; weekly travel estimates return journeys.</p>
       </section>
+
+      {fitBreakdown && <section aria-labelledby="fit-explained-heading" className="mt-6 border border-border bg-paper p-5">
+        <p className="font-mono text-xs uppercase tracking-[0.14em] text-muted-ink">Why this score</p>
+        <h3 id="fit-explained-heading" className="mt-2 text-lg font-semibold">{fitBreakdown.passingVisits} of {fitBreakdown.totalVisits} weekly visits are within your limit</h3>
+        <p className="mt-2 text-sm leading-6 text-muted-ink">Routine Fit is {fitBreakdown.percentage}% because it weights each destination by how often you travel there, rather than treating every destination equally.</p>
+      </section>}
+
+      {burdenBreakdown.length > 0 && <section aria-labelledby="burden-heading" className="mt-9 border-t border-border pt-7">
+        <div className="flex flex-wrap items-end justify-between gap-3 border-b border-border pb-3">
+          <div><p className="font-mono text-xs uppercase tracking-[0.14em] text-muted-ink">Weekly travel burden</p><h3 id="burden-heading" className="mt-1 text-xl font-semibold tracking-[-0.03em]">Where your week goes</h3></div>
+          <p className="text-sm leading-5 text-muted-ink">Return travel, ranked by total time.</p>
+        </div>
+        <ol className="mt-5 space-y-5">
+          {burdenBreakdown.map((item) => <li key={item.anchorId}>
+            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1"><p className="font-medium">{item.name}</p><p className="text-sm font-medium">{formatWeeklyBurden(item.weeklyTravelMinutes)}</p></div>
+            <p className="mt-1 text-sm leading-5 text-muted-ink">{item.visitsPerWeek} visit{item.visitsPerWeek === 1 ? "" : "s"}/week · {item.percentageOfTotal}% of your weekly travel</p>
+            <div className="mt-2 h-2 overflow-hidden bg-parchment" aria-hidden="true"><div className="h-full bg-moss transition-[width]" style={{ width: `${item.barPercentage}%` }} /></div>
+          </li>)}
+        </ol>
+      </section>}
 
       <section aria-labelledby="routes-heading" className="mt-9">
         <div className="flex items-end justify-between gap-4 border-b border-border pb-3">
