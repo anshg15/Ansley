@@ -19,9 +19,8 @@ const newsreader = Newsreader({
 });
 
 export const metadata: Metadata = {
-  title: "Decoded | Rental intelligence for real life",
-  description:
-    "Understand how a potential address fits your real weekly routine before you sign a lease.",
+  title: "Decoded - Decode your life before you sign",
+  description: "Understand how a potential address fits your real weekly routine before you sign a lease.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
