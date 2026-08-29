@@ -7,7 +7,7 @@ import { CheckIcon, ClockIcon, RouteIcon, SparkIcon, ArrowRightIcon } from "@/co
 
 export default function Home() {
   return (
-    <main className="w-full max-w-full overflow-x-hidden bg-parchment text-ink">
+    <main className="page-shell w-full max-w-full overflow-x-hidden bg-parchment text-ink">
       <header className="border-b border-border/90 bg-parchment/92 backdrop-blur-sm">
         <div className="mx-auto flex h-[4.5rem] w-full max-w-[94rem] items-center justify-between px-5 sm:px-8 lg:px-10">
           <Link href="/" className="group flex items-center gap-3" aria-label="Decoded home">

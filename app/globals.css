@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --parchment: #f6f0e6;
+  --parchment: #fffff3;
   --paper: #fffdf8;
   --ink: #10271f;
   --moss: #0b735f;
@@ -94,6 +94,31 @@ select {
   border-bottom: 1px solid color-mix(in srgb, var(--border) 90%, transparent);
   background: color-mix(in srgb, var(--parchment) 91%, transparent);
   backdrop-filter: blur(14px);
+}
+
+.page-shell {
+  position: relative;
+  isolation: isolate;
+  overflow-x: clip;
+}
+
+.page-shell::before {
+  position: fixed;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  background-image:
+    radial-gradient(ellipse 46rem 34rem at 100% 0%, rgba(0, 56, 43, 0.52) 0%, rgba(5, 126, 104, 0.4) 28%, rgba(61, 204, 211, 0.28) 50%, transparent 76%),
+    radial-gradient(ellipse 48rem 38rem at 0% 100%, rgba(0, 56, 43, 0.46) 0%, rgba(5, 126, 104, 0.34) 28%, rgba(61, 204, 211, 0.3) 52%, transparent 78%);
+  filter: blur(10px);
+  opacity: 0.82;
+  transform: scale(1.02);
+}
+
+.page-shell > * {
+  position: relative;
+  z-index: 1;
 }
 
 .desktop-only {
