@@ -98,6 +98,13 @@ select {
   border-color: var(--danger);
 }
 
+/* A destination card is already two columns at tablet/desktop widths. Keep its
+   two numeric controls vertically paired so their labels never compete for the
+   same narrow column (for example: “Visits/weekMax minutes”). */
+fieldset .grid.grid-cols-2 {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .button-primary,
 .button-secondary {
   display: flex;
