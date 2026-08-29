@@ -1,10 +1,5 @@
 import type { AddressTruthReport, ReportModule } from "@/lib/domain/analysis";
-
-function formatMinutes(minutes: number) {
-  const hours = Math.floor(minutes / 60);
-  const remainder = minutes % 60;
-  return hours > 0 ? `${hours}h ${remainder}m` : `${remainder}m`;
-}
+import { formatWeeklyBurden, reportVerdict } from "@/lib/report/presentation";
 
 function moduleMessage(module: ReportModule) {
   if (module.coverage === "partial") return module.message ?? "Some results are unavailable.";
@@ -49,7 +44,7 @@ export function AnalysisReport({ report, onEdit }: { report: AddressTruthReport;
         </div>
         <div className="bg-paper p-4">
           <dt className="font-mono text-xs uppercase tracking-[0.14em] text-muted-ink">Weekly travel</dt>
-          <dd className="mt-2 text-3xl font-semibold tracking-[-0.04em]">{formatMinutes(report.summary.weeklyTravelMinutes)}</dd>
+          <dd className="mt-2 text-3xl font-semibold tracking-[-0.04em]">{formatWeeklyBurden(report.summary.weeklyTravelMinutes)}</dd>
           <p className="mt-2 text-sm leading-5 text-muted-ink">Estimated return travel across your routine.</p>
         </div>
         <div className="bg-paper p-4">
@@ -58,6 +53,12 @@ export function AnalysisReport({ report, onEdit }: { report: AddressTruthReport;
           <p className="mt-2 text-sm leading-5 text-muted-ink">Of {report.summary.analysedAnchors + report.failedAnchors.length} submitted.</p>
         </div>
       </dl>
+
+      <section aria-label="Address verdict" className="mt-6 border-l-2 border-moss bg-parchment px-5 py-4">
+        <p className="font-mono text-xs uppercase tracking-[0.14em] text-muted-ink">Decoded verdict</p>
+        <p className="mt-2 font-medium leading-6">{reportVerdict(report)}</p>
+        <p className="mt-2 text-sm leading-6 text-muted-ink">Routine Fit compares each regular journey with the travel limit you chose; weekly travel estimates return journeys.</p>
+      </section>
 
       <section aria-labelledby="routes-heading" className="mt-9">
         <div className="flex items-end justify-between gap-4 border-b border-border pb-3">
@@ -94,6 +95,13 @@ export function AnalysisReport({ report, onEdit }: { report: AddressTruthReport;
           {report.failedAnchors.map((anchor) => <li key={anchor.anchorId} className="border border-amber/40 bg-amber/10 px-4 py-3 text-sm leading-6"><strong>{anchor.name}:</strong> {anchor.message}</li>)}
         </ul>}
       </section>
+
+      {report.timeLens.some((item) => item.status === "available") && <section aria-labelledby="timelens-heading" className="mt-9 border-t border-border pt-7">
+        <p className="font-mono text-xs uppercase tracking-[0.14em] text-muted-ink">TimeLens</p><h3 id="timelens-heading" className="mt-1 text-xl font-semibold">Morning and evening</h3>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">{report.timeLens.filter((item) => item.status === "available").map((item) => <article key={item.anchorId} className="border border-border p-4"><p className="font-medium">{report.anchors.find((anchor) => anchor.id === item.anchorId)?.name ?? "Regular destination"}</p><dl className="mt-3 grid grid-cols-2 gap-3 text-sm">{item.periods.map((period) => <div key={period.id}><dt className="text-muted-ink">{period.label}</dt><dd className="mt-1 text-lg font-semibold">{period.durationMinutes}m</dd></div>)}</dl>{item.variationMinutes !== undefined && <p className="mt-3 text-sm text-muted-ink">Up to {item.variationMinutes} minutes of variation.</p>}</article>)}</div>
+      </section>}
+
+      {report.shadowCommutes.length > 0 && <section aria-labelledby="shadow-heading" className="mt-9 border-t border-border pt-7"><p className="font-mono text-xs uppercase tracking-[0.14em] text-muted-ink">ShadowCommute</p><h3 id="shadow-heading" className="mt-1 text-xl font-semibold">Route resilience, not a disruption prediction</h3><ul className="mt-4 space-y-3">{report.shadowCommutes.map((item) => <li key={item.anchorId} className="border border-border p-4"><p className="font-medium">{report.anchors.find((anchor) => anchor.id === item.anchorId)?.name ?? "Regular destination"} · <span className="capitalize">{item.level}</span></p><p className="mt-1 text-sm leading-6 text-muted-ink">{item.reasons.join(" · ")}</p></li>)}</ul></section>}
 
       {report.insights.length > 0 && <section aria-labelledby="insights-heading" className="mt-9 border-t border-border pt-7">
         <p className="font-mono text-xs uppercase tracking-[0.14em] text-muted-ink">What stands out</p>
