@@ -6,7 +6,7 @@ function moduleMessage(module: ReportModule) {
   return module.status === "unavailable" ? module.message : undefined;
 }
 
-export function AnalysisReport({ report, onEdit }: { report: AddressTruthReport; onEdit: () => void }) {
+export function AnalysisReport({ report, onEdit, demo = false }: { report: AddressTruthReport; onEdit: () => void; demo?: boolean }) {
   const transportMessage = moduleMessage(report.modules.transport);
   const unavailableModules = [
     ["TimeLens", report.modules.timeLens],
@@ -26,6 +26,7 @@ export function AnalysisReport({ report, onEdit }: { report: AddressTruthReport;
           <p className="mt-2 text-sm leading-6 text-muted-ink">
             Analysis generated {new Intl.DateTimeFormat("en-AU", { dateStyle: "medium", timeStyle: "short" }).format(new Date(report.generatedAt))}.
           </p>
+          {demo && <p role="status" className="mt-3 border-l-2 border-amber bg-amber/10 px-3 py-2 text-sm leading-6">Saved TfNSW demo snapshot captured 29 Aug 2026. It is not live route data.</p>}
         </div>
         <button type="button" onClick={onEdit} className="button-secondary min-h-0 px-4 py-2 text-sm">Edit details</button>
       </div>

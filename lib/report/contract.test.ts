@@ -1,0 +1,2 @@
+import assert from "node:assert/strict"; import test from "node:test"; import { decodedReportFixture } from "@/fixtures/address-truth-report"; import { isAddressTruthReport } from "./contract";
+test("accepts the typed demo report and rejects malformed response shapes", () => { assert.equal(isAddressTruthReport(decodedReportFixture), true); assert.equal(isAddressTruthReport({ property: {}, routes: [] }), false); assert.equal(isAddressTruthReport(null), false); });
