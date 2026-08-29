@@ -1,6 +1,23 @@
 import Link from "next/link";
 import { OnboardingFlow } from "@/components/onboarding/onboarding-flow";
 
+function DecodedHouseMark({ className = "h-9 w-9" }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 64 64"
+      className={className}
+      focusable="false"
+    >
+      <rect width="64" height="64" rx="16" fill="#FFFDF8" />
+      <path d="M12 30.5 32 13l20 17.5V51a4 4 0 0 1-4 4H16a4 4 0 0 1-4-4V30.5Z" fill="#426957" />
+      <path d="M24 55V39.5a3.5 3.5 0 0 1 3.5-3.5h9a3.5 3.5 0 0 1 3.5 3.5V55H24Z" fill="#F5F1E8" />
+      <circle cx="36.5" cy="45.5" r="1.9" fill="#D96B48" />
+      <path d="M18 29.5 32 17.3l14 12.2" fill="none" stroke="#29483C" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export default function Home() {
   return (
     <main className="min-h-screen text-ink">
@@ -9,9 +26,9 @@ export default function Home() {
           <Link href="/" className="group flex items-center gap-3" aria-label="Decoded home">
             <span
               aria-hidden="true"
-              className="grid h-9 w-9 place-items-center rounded-full border border-moss/40 bg-paper shadow-[0_5px_16px_rgba(23,35,29,0.04)]"
+              className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-[0.9rem] border border-moss/25 bg-paper shadow-[0_7px_20px_rgba(23,35,29,0.06)] transition-[transform,box-shadow,border-color] duration-200 group-hover:-translate-y-0.5 group-hover:border-moss/45 group-hover:shadow-[0_10px_24px_rgba(23,35,29,0.09)]"
             >
-              <span className="h-2.5 w-2.5 rounded-full bg-transit-coral transition-transform duration-200 group-hover:scale-125" />
+              <DecodedHouseMark className="h-9 w-9" />
             </span>
             <span>
               <span className="block font-mono text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-muted-ink">
