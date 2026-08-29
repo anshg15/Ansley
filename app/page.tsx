@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { OnboardingFlow } from "@/components/onboarding/onboarding-flow";
 
 export default function Home() {
   return (
@@ -55,88 +56,7 @@ export default function Home() {
             className="absolute -left-6 top-10 hidden h-px w-12 bg-moss lg:block"
           />
 
-          <section
-            aria-labelledby="property-heading"
-            className="border border-border bg-paper p-6 sm:p-8"
-          >
-            <div className="flex items-start justify-between gap-6 border-b border-border pb-5">
-              <div>
-                <p className="font-mono text-xs uppercase tracking-[0.16em] text-muted-ink">
-                  Step 01
-                </p>
-                <h2
-                  id="property-heading"
-                  className="mt-2 text-2xl font-semibold tracking-[-0.03em]"
-                >
-                  Start with the address
-                </h2>
-              </div>
-
-              <span
-                aria-hidden="true"
-                className="font-mono text-3xl leading-none text-muted-blue"
-              >
-                ⌖
-              </span>
-            </div>
-
-            <form className="mt-7">
-              <label
-                htmlFor="property-address"
-                className="block text-sm font-medium"
-              >
-                Potential property
-              </label>
-
-              <p
-                id="property-address-help"
-                className="mt-1 text-sm leading-6 text-muted-ink"
-              >
-                Enter the rental address you&apos;re considering.
-              </p>
-
-              <input
-                id="property-address"
-                name="propertyAddress"
-                type="text"
-                autoComplete="street-address"
-                aria-describedby="property-address-help"
-                placeholder="e.g. 42 King Street, Newtown NSW"
-                className="mt-4 w-full border border-border bg-paper px-4 py-3.5 text-base text-ink outline-none transition-colors placeholder:text-muted-ink/60 focus:border-moss"
-              />
-
-              <button
-                type="button"
-                className="mt-6 flex w-full items-center justify-between bg-ink px-5 py-4 text-left text-sm font-semibold text-paper transition-opacity hover:opacity-90"
-              >
-                <span>Continue to your routine</span>
-                <span aria-hidden="true">→</span>
-              </button>
-            </form>
-
-            <div className="mt-7 grid grid-cols-3 gap-3 border-t border-border pt-5">
-              <div>
-                <p className="font-mono text-[0.68rem] uppercase tracking-[0.14em] text-muted-ink">
-                  Analyse
-                </p>
-                <p className="mt-1 text-sm font-medium">Real routes</p>
-              </div>
-
-              <div>
-                <p className="font-mono text-[0.68rem] uppercase tracking-[0.14em] text-muted-ink">
-                  Compare
-                </p>
-                <p className="mt-1 text-sm font-medium">Your tolerance</p>
-              </div>
-
-              <div>
-                <p className="font-mono text-[0.68rem] uppercase tracking-[0.14em] text-muted-ink">
-                  Reveal
-                </p>
-                <p className="mt-1 text-sm font-medium">Weekly burden</p>
-              </div>
-            </div>
-          </section>
+          <OnboardingFlow />
         </div>
       </section>
     </main>

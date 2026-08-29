@@ -8,6 +8,8 @@
   --transit-coral: #d96b48;
   --muted-blue: #6f9da3;
   --amber: #b77a2a;
+  --danger: #963f30;
+  --focus: #205f69;
 
   --border: #d8d3c8;
   --muted-ink: #657069;
@@ -27,6 +29,7 @@
   --color-transit-coral: var(--transit-coral);
   --color-muted-blue: var(--muted-blue);
   --color-amber: var(--amber);
+  --color-danger: var(--danger);
   --color-border: var(--border);
   --color-muted-ink: var(--muted-ink);
 
@@ -68,6 +71,61 @@ select {
 }
 
 :focus-visible {
-  outline: 3px solid var(--muted-blue);
+  outline: 3px solid var(--focus);
   outline-offset: 3px;
+}
+
+.form-control {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--paper);
+  padding: 0.875rem 1rem;
+  color: var(--ink);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 150ms ease;
+}
+
+.form-control::placeholder {
+  color: color-mix(in srgb, var(--muted-ink) 60%, transparent);
+}
+
+.form-control:focus {
+  border-color: var(--moss);
+}
+
+.form-control[aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+.button-primary,
+.button-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 3.25rem;
+  padding: 0.875rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: opacity 150ms ease, background-color 150ms ease;
+}
+
+.button-primary {
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.button-primary:hover {
+  opacity: 0.9;
+}
+
+.button-secondary {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--ink);
+}
+
+.button-secondary:hover {
+  background: var(--parchment);
 }
