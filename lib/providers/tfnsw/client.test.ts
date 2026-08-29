@@ -18,13 +18,20 @@ test("uses Stop Finder results to request and normalise a TfNSW trip", async () 
   };
 
   try {
-    const route = await new TfnswClient(fetcher, "https://example.test/v1/tp").analyseJourney("Origin", "Destination", "uni");
-    const tripRequest = requests.find((request) => request.url.includes("/trip?"));
+    const client = new TfnswClient(fetcher, "https://example.test/v1/tp");
+    const route = await client.analyseJourney("Origin", "Destination", "uni");
+    await client.analyseJourneyAt("Origin", "Destination", "uni", {
+      date: "2026-08-31", time: "18:00", timeZone: "Australia/Sydney",
+    });
+    const tripRequests = requests.filter((request) => request.url.includes("/trip?"));
+    const tripRequest = tripRequests[0];
 
-    assert.equal(requests.length, 3);
+    assert.equal(requests.length, 4);
     assert.equal(tripRequest?.headers.get("authorization"), "apikey test-key");
     assert.equal(new URL(tripRequest?.url).searchParams.get("name_origin"), "101");
     assert.equal(new URL(tripRequest?.url).searchParams.get("name_destination"), "202");
+    assert.equal(new URL(tripRequests[1].url).searchParams.get("itdDate"), "20260831");
+    assert.equal(new URL(tripRequests[1].url).searchParams.get("itdTime"), "1800");
     assert.equal(route.durationMinutes, 33);
   } finally {
     if (previousKey === undefined) delete process.env.TFNSW_API_KEY;

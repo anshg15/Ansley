@@ -1,16 +1,25 @@
 import { generateCoreInsights } from "./insights";
 import { calculateRoutineFit } from "./routine-fit";
+import { analyseShadowCommutes } from "./shadow-commute";
+import { analyseTimeLens, isTimeLensEnabled } from "./time-lens";
 import { calculateTotalWeeklyTravelMinutes, calculateWeeklyTravelMinutes } from "./weekly-burden";
 import type {
   AddressTruthReport,
   AnalysedAnchor,
   AnalysisRequest,
   FailedAnchor,
+  RepresentativeDeparture,
   RouteAnalysis,
 } from "@/lib/domain/analysis";
 
 export type TransportProvider = {
   analyseJourney(originAddress: string, destinationAddress: string, anchorId: string): Promise<RouteAnalysis>;
+  analyseJourneyAt?(
+    originAddress: string,
+    destinationAddress: string,
+    anchorId: string,
+    departure: RepresentativeDeparture,
+  ): Promise<RouteAnalysis>;
 };
 
 const MAX_CONCURRENT_ROUTE_REQUESTS = 2;
@@ -66,6 +75,8 @@ export async function analyseAddressTruth(
     .map((outcome) => outcome.failed);
   const weeklyTravelMinutes = calculateTotalWeeklyTravelMinutes(anchors);
   const routineFit = calculateRoutineFit(anchors);
+  const timeLens = await analyseTimeLens(request.property.address, anchors, request.options, transportProvider);
+  const shadowCommutes = analyseShadowCommutes(anchors);
 
   return {
     property: request.property,
@@ -78,12 +89,20 @@ export async function analyseAddressTruth(
     },
     routineFit,
     insights: generateCoreInsights(anchors, routineFit),
+    timeLens,
+    shadowCommutes,
     modules: {
       transport: anchors.length > 0
         ? { status: "available" }
         : { status: "unavailable", message: "Live transport analysis is temporarily unavailable." },
-      timeLens: { status: "unavailable", message: "Time-based analysis has not been enabled yet." },
-      shadowCommute: { status: "unavailable", message: "Route-fragility analysis has not been enabled yet." },
+      timeLens: timeLens.length > 0 && timeLens.every((result) => result.status === "available")
+        ? { status: "available" }
+        : { status: "unavailable", message: isTimeLensEnabled(request.options)
+          ? "Representative-time analysis is temporarily unavailable; showing the primary route only."
+          : "Time-based analysis was not requested." },
+      shadowCommute: shadowCommutes.length > 0
+        ? { status: "available" }
+        : { status: "unavailable", message: "Route-fragility analysis requires a primary route." },
       amenities: { status: "unavailable", message: "Everyday access analysis has not been enabled yet." },
     },
     generatedAt: new Date().toISOString(),
