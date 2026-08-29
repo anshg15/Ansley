@@ -1,5 +1,5 @@
 import type { AddressTruthReport, ReportModule } from "@/lib/domain/analysis";
-import { formatWeeklyBurden, reportVerdict } from "@/lib/report/presentation";
+import { formatJourneyCadence, formatWeeklyBurden, reportVerdict } from "@/lib/report/presentation";
 
 function moduleMessage(module: ReportModule) {
   if (module.coverage === "partial") return module.message ?? "Some results are unavailable.";
@@ -80,9 +80,12 @@ export function AnalysisReport({ report, onEdit, demo = false }: { report: Addre
                   <p className="mt-1 text-sm leading-6 text-muted-ink">
                     {route.transportMode} · {route.transfers === 0 ? "no transfers" : `${route.transfers} transfer${route.transfers === 1 ? "" : "s"}`} · {route.walkingMinutes} min walking
                   </p>
+                  <p className="mt-1 text-sm leading-6 text-muted-ink">
+                    {formatJourneyCadence(anchor?.visitsPerWeek ?? 0, route.weeklyTravelMinutes)}
+                  </p>
                 </div>
                 <div className="flex items-end justify-between gap-6 sm:block sm:text-right">
-                  <p className="text-2xl font-semibold tracking-[-0.04em]">{route.durationMinutes}m</p>
+                  <p className="text-2xl font-semibold tracking-[-0.04em]">{route.durationMinutes}m <span className="text-sm font-normal tracking-normal text-muted-ink">one way</span></p>
                   <p className={route.withinTolerance ? "text-sm font-medium text-moss" : "text-sm font-medium text-danger"}>
                     {route.withinTolerance ? "Within your limit" : "Over your limit"}
                   </p>

@@ -12,3 +12,7 @@ export function formatWeeklyBurden(minutes: number) {
   const hours = Math.floor(minutes / 60); const remainder = minutes % 60;
   return hours ? `${hours}h ${remainder}m` : `${remainder}m`;
 }
+
+export function formatJourneyCadence(visitsPerWeek: number, weeklyTravelMinutes: number) {
+  return `${visitsPerWeek} visit${visitsPerWeek === 1 ? "" : "s"}/week · ${formatWeeklyBurden(weeklyTravelMinutes)} return travel`;
+}
