@@ -126,6 +126,22 @@ export type ShadowCommuteResult = {
 
 export type ModuleStatus = "available" | "unavailable";
 
+export type ReportModuleCoverage = "complete" | "partial" | "none";
+
+export type ReportModuleSource = "live" | "derived" | "not-requested" | "not-enabled";
+
+/**
+ * Provider-independent metadata for rendering an honest module state.
+ * It deliberately contains no raw provider payloads, credentials, or claims
+ * beyond the analysis that was actually completed for this report.
+ */
+export type ReportModule = {
+  status: ModuleStatus;
+  coverage: ReportModuleCoverage;
+  source: ReportModuleSource;
+  message?: string;
+};
+
 export type SafetySource = {
   label: "official-data" | "listing-derived" | "user-confirmed" | "addresstruth-heuristic";
   name: string;
@@ -172,11 +188,11 @@ export type AddressTruthReport = {
   timeLens: TimeLensResult[];
   shadowCommutes: ShadowCommuteResult[];
   modules: {
-    transport: { status: ModuleStatus; message?: string };
-    timeLens: { status: ModuleStatus; message?: string };
-    shadowCommute: { status: ModuleStatus; message?: string };
-    amenities: { status: ModuleStatus; message?: string };
-    safety: { status: ModuleStatus; message?: string };
+    transport: ReportModule;
+    timeLens: ReportModule;
+    shadowCommute: ReportModule;
+    amenities: ReportModule;
+    safety: ReportModule;
   };
   safetyContext: SafetyContext;
   generatedAt: string;

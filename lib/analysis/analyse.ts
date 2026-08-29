@@ -51,11 +51,29 @@ export async function analyseAddressTruth(request: AnalysisRequest, transportPro
     timeLens,
     shadowCommutes,
     modules: {
-      transport: anchors.length > 0 ? { status: "available" } : { status: "unavailable", message: "Live transport analysis is temporarily unavailable." },
-      timeLens: timeLens.length > 0 && timeLens.every((result) => result.status === "available") ? { status: "available" } : { status: "unavailable", message: isTimeLensEnabled(request.options) ? "Representative-time analysis is temporarily unavailable; showing the primary route only." : "Time-based analysis was not requested." },
-      shadowCommute: shadowCommutes.length > 0 ? { status: "available" } : { status: "unavailable", message: "Route-fragility analysis requires a primary route." },
-      amenities: { status: "unavailable", message: "Everyday access analysis has not been enabled yet." },
-      safety: safetyContext.area.status === "available" ? { status: "available" } : { status: "unavailable", message: safetyContext.area.message },
+      transport: anchors.length > 0
+        ? {
+          status: "available",
+          coverage: failedAnchors.length > 0 ? "partial" : "complete",
+          source: "live",
+          ...(failedAnchors.length > 0 ? { message: "Some destinations could not be analysed with live transport data." } : {}),
+        }
+        : { status: "unavailable", coverage: "none", source: "live", message: "Live transport analysis is temporarily unavailable." },
+      timeLens: timeLens.length > 0 && timeLens.every((result) => result.status === "available")
+        ? { status: "available", coverage: "complete", source: "live" }
+        : {
+          status: "unavailable",
+          coverage: "none",
+          source: isTimeLensEnabled(request.options) ? "live" : "not-requested",
+          message: isTimeLensEnabled(request.options) ? "Representative-time analysis is temporarily unavailable; showing the primary route only." : "Time-based analysis was not requested.",
+        },
+      shadowCommute: shadowCommutes.length > 0
+        ? { status: "available", coverage: "complete", source: "derived" }
+        : { status: "unavailable", coverage: "none", source: "derived", message: "Route-fragility analysis requires a primary route." },
+      amenities: { status: "unavailable", coverage: "none", source: "not-enabled", message: "Everyday access analysis has not been enabled yet." },
+      safety: safetyContext.area.status === "available"
+        ? { status: "available", coverage: "complete", source: "live" }
+        : { status: "unavailable", coverage: "none", source: safetyProvider ? "live" : "not-enabled", message: safetyContext.area.message },
     },
     safetyContext,
     generatedAt: new Date().toISOString(),
