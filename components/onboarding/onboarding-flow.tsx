@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { AnalysisRequest, AnchorCategory } from "@/lib/domain/analysis";
+import type { AddressTruthReport, AnalysisRequest, AnchorCategory } from "@/lib/domain/analysis";
+import { AnalysisReport } from "@/components/report/analysis-report";
 import {
   buildAnalysisRequest,
   OnboardingDraftError,
@@ -9,7 +10,7 @@ import {
   validatePropertyAddress,
 } from "@/lib/onboarding/draft";
 
-type Step = "property" | "routine" | "review";
+type Step = "property" | "routine" | "review" | "analysing" | "report";
 
 const categories: Array<{ value: AnchorCategory; label: string }> = [
   { value: "work", label: "Work" },
@@ -40,6 +41,8 @@ export function OnboardingFlow() {
   const [maxTravelMinutes, setMaxTravelMinutes] = useState("45");
   const [routineErrors, setRoutineErrors] = useState<OnboardingErrors>({});
   const [analysisRequest, setAnalysisRequest] = useState<AnalysisRequest>();
+  const [report, setReport] = useState<AddressTruthReport>();
+  const [analysisError, setAnalysisError] = useState<string>();
   const propertyInputRef = useRef<HTMLInputElement>(null);
   const stepHeadingRef = useRef<HTMLHeadingElement>(null);
 
@@ -80,6 +83,45 @@ export function OnboardingFlow() {
       }
       throw error;
     }
+  }
+
+  async function runAnalysis() {
+    if (!analysisRequest) return;
+    setAnalysisError(undefined);
+    setStep("analysing");
+    try {
+      const response = await fetch("/api/analyse", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(analysisRequest),
+      });
+      const payload: unknown = await response.json();
+      if (!response.ok || !payload || typeof payload !== "object" || !("property" in payload)) {
+        const message = payload && typeof payload === "object" && "error" in payload && typeof payload.error === "string"
+          ? payload.error
+          : "We could not complete this address analysis. Please try again.";
+        throw new Error(message);
+      }
+      setReport(payload as AddressTruthReport);
+      setStep("report");
+    } catch (error) {
+      setAnalysisError(error instanceof Error ? error.message : "We could not complete this address analysis. Please try again.");
+      setStep("review");
+    }
+  }
+
+  if (step === "report" && report) {
+    return <AnalysisReport report={report} onEdit={() => setStep("review")} />;
+  }
+
+  if (step === "analysing") {
+    return (
+      <section aria-live="polite" aria-labelledby="analysis-heading" className="border border-border bg-paper p-6 sm:p-8">
+        <p className="font-mono text-xs uppercase tracking-[0.16em] text-moss">Analysing your routine</p>
+        <h2 id="analysis-heading" className="mt-2 text-2xl font-semibold tracking-[-0.03em]">Checking the journeys that shape your week</h2>
+        <p className="mt-4 text-sm leading-6 text-muted-ink">We&apos;re requesting route data and calculating travel burden. This can take a moment.</p>
+      </section>
+    );
   }
 
   if (step === "routine") {
@@ -250,15 +292,17 @@ export function OnboardingFlow() {
         </dl>
 
         <div className="mt-6 bg-parchment px-4 py-4">
-          <p className="text-sm font-semibold">Ready for the analysis integration</p>
+          <p className="text-sm font-semibold">Ready to check your routine</p>
           <p className="mt-1 text-sm leading-6 text-muted-ink">
-            These details now form a valid analysis request. No live journey has been requested yet.
+            We&apos;ll calculate the route, weekly burden and how it fits your travel preference.
           </p>
         </div>
 
+        {analysisError && <p role="alert" className="mt-5 border border-danger/30 bg-danger/5 px-4 py-3 text-sm leading-6 text-danger">{analysisError}</p>}
+
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           <button type="button" onClick={() => setStep("property")} className="button-secondary">Edit property</button>
-          <button type="button" onClick={() => setStep("routine")} className="button-primary">Edit routine</button>
+          <button type="button" onClick={runAnalysis} className="button-primary">Analyse this address <span aria-hidden="true">→</span></button>
         </div>
       </section>
     );
