@@ -81,9 +81,18 @@ function modeForLeg(leg: UnknownRecord) {
 
 function normaliseJourney(journey: UnknownRecord, anchorId: string, alternatives: UnknownRecord[]): TransportJourney {
   const legs = legCandidates(journey);
-  const durationMinutes = journey.durationMinutes === undefined
+  const journeyDurationMinutes = journey.durationMinutes === undefined
     ? minutesFromDuration(journey.duration)
     : minutesFromDuration(journey.durationMinutes, "minutes");
+  // Current TfNSW live responses can omit a journey-level duration while still
+  // providing durations for every leg. Sum those legs instead of discarding a
+  // valid journey solely because an optional summary field is absent.
+  const durationMinutes = journeyDurationMinutes ?? (() => {
+    const total = legs.reduce((minutes, leg) => minutes + (leg.durationMinutes === undefined
+      ? (minutesFromDuration(leg.duration) ?? 0)
+      : (minutesFromDuration(leg.durationMinutes, "minutes") ?? 0)), 0);
+    return total > 0 ? total : undefined;
+  })();
   const walkingLegs = legs.filter(isWalkingLeg);
   const walkingMinutes = walkingLegs.reduce(
     (total, leg) => total + (leg.durationMinutes === undefined
