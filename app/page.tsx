@@ -50,7 +50,7 @@ export default function Home() {
             <span className="h-px w-12 bg-moss/45 sm:w-16" aria-hidden="true" />
           </div>
 
-          <h1 className="hero-title font-editorial max-w-4xl text-[clamp(3.4rem,6.1vw,6.1rem)] font-medium leading-[0.9] tracking-[-0.045em]">
+          <h1 className="hero-title font-editorial max-w-4xl text-[clamp(3.4rem,6.1vw,6.1rem)] font-medium leading-[0.98] tracking-[-0.045em]">
             Decode your life
             <span className="hero-gradient-text mt-[5px] block italic">before you sign.</span>
           </h1>
