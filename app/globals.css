@@ -3,9 +3,12 @@
 :root {
   --parchment: #f5f1e8;
   --paper: #fffdf8;
-  --ink: #17231d;
+  --ink: #16271f;
   --moss: #426957;
   --moss-deep: #29483c;
+  --emerald-deep: #123d31;
+  --emerald-mid: #24624d;
+  --emerald-lift: #4f8069;
   --transit-coral: #d96b48;
   --muted-blue: #6f9da3;
   --amber: #b77a2a;
@@ -13,7 +16,7 @@
   --focus: #205f69;
   --border: #d8d3c8;
   --border-strong: #bbb5a9;
-  --muted-ink: #657069;
+  --muted-ink: #5c6962;
   --background: var(--parchment);
   --foreground: var(--ink);
 }
@@ -26,6 +29,9 @@
   --color-ink: var(--ink);
   --color-moss: var(--moss);
   --color-moss-deep: var(--moss-deep);
+  --color-emerald-deep: var(--emerald-deep);
+  --color-emerald-mid: var(--emerald-mid);
+  --color-emerald-lift: var(--emerald-lift);
   --color-transit-coral: var(--transit-coral);
   --color-muted-blue: var(--muted-blue);
   --color-amber: var(--amber);
@@ -51,10 +57,11 @@ body {
   min-height: 100vh;
   margin: 0;
   background:
-    linear-gradient(rgba(23, 35, 29, 0.026) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(23, 35, 29, 0.026) 1px, transparent 1px),
+    linear-gradient(rgba(18, 61, 49, 0.026) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(18, 61, 49, 0.026) 1px, transparent 1px),
+    radial-gradient(circle at 16% 28%, rgba(79, 128, 105, 0.055), transparent 27rem),
     var(--parchment);
-  background-size: 36px 36px;
+  background-size: 36px 36px, 36px 36px, auto, auto;
   color: var(--ink);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
@@ -72,7 +79,7 @@ select {
 }
 
 ::selection {
-  background: var(--moss);
+  background: var(--emerald-deep);
   color: var(--paper);
 }
 
@@ -85,9 +92,39 @@ select {
   font-family: var(--font-newsreader), Georgia, serif;
 }
 
+.hero-heading {
+  text-wrap: balance;
+  text-shadow: 0 1px 0 rgba(255, 253, 248, 0.45);
+}
+
+.hero-gradient {
+  color: var(--moss);
+  background: linear-gradient(105deg, var(--emerald-deep) 0%, var(--emerald-mid) 45%, var(--emerald-lift) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .surface-paper {
   background: color-mix(in srgb, var(--paper) 97%, transparent);
-  box-shadow: 0 24px 70px rgba(23, 35, 29, 0.07);
+  box-shadow:
+    0 28px 76px rgba(18, 61, 49, 0.09),
+    0 5px 18px rgba(23, 35, 29, 0.035);
+}
+
+.analysis-shell {
+  position: relative;
+  isolation: isolate;
+}
+
+.analysis-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  z-index: 2;
+  background: linear-gradient(90deg, var(--emerald-deep), var(--moss), var(--transit-coral));
+  opacity: 0.95;
 }
 
 .route-rule {
@@ -137,8 +174,8 @@ select {
 }
 
 .form-control:focus {
-  border-color: var(--moss);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--moss) 12%, transparent);
+  border-color: var(--emerald-mid);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--emerald-mid) 12%, transparent);
 }
 
 .form-control[aria-invalid="true"] {
@@ -160,30 +197,32 @@ fieldset .grid.grid-cols-2 {
   padding: 0.875rem 1.2rem;
   font-size: 0.875rem;
   font-weight: 650;
-  transition: transform 150ms ease, opacity 150ms ease, background-color 150ms ease, border-color 150ms ease;
+  transition: transform 150ms ease, opacity 150ms ease, background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
 }
 
 .button-primary {
-  border: 1px solid var(--ink);
-  background: var(--ink);
+  border: 1px solid var(--emerald-deep);
+  background: var(--emerald-deep);
   color: var(--paper);
+  box-shadow: 0 8px 18px rgba(18, 61, 49, 0.08);
 }
 
 .button-primary:hover {
   transform: translateY(-1px);
-  background: var(--moss-deep);
-  border-color: var(--moss-deep);
+  background: var(--emerald-mid);
+  border-color: var(--emerald-mid);
+  box-shadow: 0 12px 24px rgba(18, 61, 49, 0.12);
 }
 
 .button-secondary {
   border: 1px solid var(--border-strong);
-  background: color-mix(in srgb, var(--paper) 65%, transparent);
+  background: color-mix(in srgb, var(--paper) 70%, transparent);
   color: var(--ink);
 }
 
 .button-secondary:hover {
   transform: translateY(-1px);
-  border-color: var(--moss);
+  border-color: var(--emerald-mid);
   background: var(--paper);
 }
 
@@ -192,6 +231,18 @@ fieldset .grid.grid-cols-2 {
   cursor: not-allowed;
   transform: none;
   opacity: 0.48;
+}
+
+@media (max-width: 639px) {
+  .hero-heading {
+    max-width: 6.6ch;
+  }
+
+  .hero-gradient {
+    background: linear-gradient(105deg, var(--emerald-deep), var(--emerald-lift));
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
