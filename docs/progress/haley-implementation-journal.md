@@ -279,6 +279,33 @@ git diff --check
 
 For Safety Context only, a separate read-only live BOCSAR check is useful when the upstream workbook changes. Normal tests do not need network access or API keys.
 
+## Tasks AN-43 and AN-44 — Honest module states and deterministic API integration
+
+### What we built
+
+The `AddressTruthReport.modules` contract now gives the frontend three safe, provider-independent facts for every module:
+
+- `status`: whether there is usable output;
+- `coverage`: whether the output is complete, partial, or absent; and
+- `source`: whether it comes from a live provider, a derived calculation, an intentionally unrequested module, or a module not yet enabled.
+
+For example, if one of two anchors cannot be routed, transport remains available but reports `coverage: "partial"` with a concise user-safe explanation. This lets the report UI render the successful destination while honestly identifying the gap.
+
+[`app/api/analyse/route.ts`](../../app/api/analyse/route.ts) also exports a small handler factory. Production still constructs the real TfNSW, BOCSAR, and NSW LGA clients on the server. Tests can instead pass deterministic provider doubles, with no credentials or network access.
+
+### Why we did it this way
+
+Ansh owns the report experience and needs a stable, simple signal for loading, unavailable, and partial-result states. The UI should not inspect TfNSW or BOCSAR failures or know their response formats. These fields are additive to the shared report contract, so they do not displace the existing route, safety, TimeLens, or ShadowCommute data.
+
+### Verification
+
+[`app/api/analyse/route.test.ts`](../../app/api/analyse/route.test.ts) now covers the complete request parsing → analysis → JSON response pipeline in two important cases:
+
+1. a fully successful route and official safety-context response; and
+2. a partial transport failure where one route succeeds and one is unavailable.
+
+The deterministic tests prove the exact response that the frontend integrates with, while production continues to use real server-side provider clients.
+
 ## Important implementation principles
 
 1. **The user sets the preferences.** Travel tolerance and anchor frequency come from the request; the app does not silently decide what matters.
