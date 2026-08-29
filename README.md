@@ -40,6 +40,19 @@ Successful BOCSAR reads are cached server-side for six hours. If a refresh later
 
 Run `npm run check:providers` before a demo to perform a read-only BOCSAR compatibility check and, when `TFNSW_API_KEY` is configured, a read-only TfNSW route check. The normal test suite and CI remain deterministic and do not call live providers.
 
+## Get live route results locally
+
+The address fields accept normal NSW place or street-address text, for example `1 King Street, Newtown NSW 2042` and `University of Sydney, Camperdown NSW 2050`. Live journey times and Routine Fit require a TfNSW server-side API key:
+
+```bash
+cp .env.example .env.local
+# Add your key after the equals sign in .env.local:
+# TFNSW_API_KEY=your-key
+npm run dev
+```
+
+Restart the development server after changing `.env.local`, then submit the property and at least one regular destination. Without a key, the report intentionally shows an unavailable state rather than making up travel times or a score; use **Try the saved demo** for a complete, clearly labelled walkthrough.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

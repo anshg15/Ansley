@@ -1,13 +1,15 @@
 import type { AddressTruthReport, ReportModule } from "@/lib/domain/analysis";
 import { formatJourneyCadence, formatWeeklyBurden, reportVerdict } from "@/lib/report/presentation";
+import { transportSetupMessage } from "@/lib/report/transport-status";
 
 function moduleMessage(module: ReportModule) {
   if (module.coverage === "partial") return module.message ?? "Some results are unavailable.";
   return module.status === "unavailable" ? module.message : undefined;
 }
 
-export function AnalysisReport({ report, onEdit, demo = false }: { report: AddressTruthReport; onEdit: () => void; demo?: boolean }) {
+export function AnalysisReport({ report, onEdit, onOpenDemo, demo = false }: { report: AddressTruthReport; onEdit: () => void; onOpenDemo?: () => void; demo?: boolean }) {
   const transportMessage = moduleMessage(report.modules.transport);
+  const setupMessage = transportSetupMessage(report);
   const unavailableModules = [
     ["TimeLens", report.modules.timeLens],
     ["ShadowCommute", report.modules.shadowCommute],
@@ -33,9 +35,10 @@ export function AnalysisReport({ report, onEdit, demo = false }: { report: Addre
 
       {transportMessage && (
         <p role="status" className="mt-6 border-l-2 border-amber bg-amber/10 px-4 py-3 text-sm leading-6 text-ink">
-          {transportMessage}
+          {setupMessage ?? transportMessage}
         </p>
       )}
+      {setupMessage && onOpenDemo && <button type="button" onClick={onOpenDemo} className="button-secondary mt-3">View the saved demo instead</button>}
 
       <dl className="mt-7 grid gap-px border border-border bg-border sm:grid-cols-3">
         <div className="bg-paper p-4">
