@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { AnchorCategory } from "@/lib/domain/anchor";
 
-interface AnchorDraft {
+export interface AnchorDraft {
   id: string;
   name: string;
   address: string;
@@ -34,10 +34,18 @@ const createAnchor = (id: string): AnchorDraft => ({
   maxTravelMinutes: "45",
 });
 
-export function AnchorEditor() {
+interface AnchorEditorProps {
+  onChange: (anchors: AnchorDraft[]) => void;
+}
+
+export function AnchorEditor({ onChange }: AnchorEditorProps) {
   const [anchors, setAnchors] = useState<AnchorDraft[]>([
     createAnchor("anchor-1"),
   ]);
+
+  useEffect(() => {
+    onChange(anchors);
+  }, [anchors, onChange]);
 
   function updateAnchor(
     id: string,

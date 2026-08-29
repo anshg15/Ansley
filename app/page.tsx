@@ -3,12 +3,24 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
-import { AnchorEditor } from "@/app/components/anchor-editor";
+import {
+  AnchorEditor,
+  type AnchorDraft,
+} from "@/app/components/anchor-editor";
+import type {
+  AddressTruthReport,
+  AnalysisRequest,
+} from "@/lib/domain/analysis";
 
 export default function Home() {
   const [propertyAddress, setPropertyAddress] = useState("");
   const [propertyError, setPropertyError] = useState("");
   const [showRoutine, setShowRoutine] = useState(false);
+  const [anchorDrafts, setAnchorDrafts] = useState<AnchorDraft[]>([]);
+  const [analysisReport, setAnalysisReport] =
+    useState<AddressTruthReport | null>(null);
+  const [analysisError, setAnalysisError] = useState("");
+  const [isAnalysing, setIsAnalysing] = useState(false);
   const propertyInputRef = useRef<HTMLInputElement>(null);
   const routineSectionRef = useRef<HTMLElement>(null);
 
@@ -36,6 +48,93 @@ export default function Home() {
 
     return () => cancelAnimationFrame(frame);
   }, [showRoutine]);
+
+  async function handleAnalyse() {
+    setAnalysisError("");
+    setAnalysisReport(null);
+
+    try {
+      if (anchorDrafts.length === 0) {
+        throw new Error("Add at least one destination before analysing.");
+      }
+
+      const anchors = anchorDrafts.map((anchor, index) => {
+        const visitsPerWeek = Number(anchor.visitsPerWeek);
+        const maxTravelMinutes = Number(anchor.maxTravelMinutes);
+
+        if (!anchor.name.trim()) {
+          throw new Error(`Destination ${index + 1} needs a name.`);
+        }
+
+        if (!anchor.address.trim()) {
+          throw new Error(`Destination ${index + 1} needs an address.`);
+        }
+
+        if (!Number.isFinite(visitsPerWeek) || visitsPerWeek <= 0) {
+          throw new Error(
+            `Destination ${index + 1} needs valid weekly visits.`,
+          );
+        }
+
+        if (!Number.isFinite(maxTravelMinutes) || maxTravelMinutes <= 0) {
+          throw new Error(
+            `Destination ${index + 1} needs a valid maximum trip time.`,
+          );
+        }
+
+        return {
+          id: anchor.id,
+          name: anchor.name.trim(),
+          address: anchor.address.trim(),
+          category: anchor.category,
+          visitsPerWeek,
+          maxTravelMinutes,
+        };
+      });
+
+      const request: AnalysisRequest = {
+        property: {
+          address: propertyAddress.trim(),
+          source: "manual",
+        },
+        anchors,
+      };
+
+      setIsAnalysing(true);
+
+      const response = await fetch("/api/analyse", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(request),
+      });
+
+      const body: unknown = await response.json();
+
+      if (!response.ok) {
+        const message =
+          body &&
+          typeof body === "object" &&
+          "error" in body &&
+          typeof body.error === "string"
+            ? body.error
+            : "We could not analyse this address. Please try again.";
+
+        throw new Error(message);
+      }
+
+      setAnalysisReport(body as AddressTruthReport);
+    } catch (error) {
+      setAnalysisError(
+        error instanceof Error
+          ? error.message
+          : "We could not analyse this address. Please try again.",
+      );
+    } finally {
+      setIsAnalysing(false);
+    }
+  }
 
   function handlePropertySubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -224,20 +323,45 @@ export default function Home() {
           className="scroll-mt-6 border-t border-border bg-paper/40"
         >
           <div className="mx-auto w-full max-w-6xl px-5 py-14 sm:px-8 sm:py-16 lg:px-10">
-            <AnchorEditor />
+            <AnchorEditor onChange={setAnchorDrafts} />
 
             <div className="mt-8 border-t border-border pt-6">
               <button
                 type="button"
-                className="flex w-full items-center justify-between bg-moss px-5 py-4 text-left text-sm font-semibold text-paper transition-opacity hover:opacity-90 sm:ml-auto sm:w-auto sm:min-w-64"
+                onClick={handleAnalyse}
+                disabled={isAnalysing}
+                className="flex w-full items-center justify-between bg-moss px-5 py-4 text-left text-sm font-semibold text-paper transition-opacity hover:opacity-90 disabled:cursor-wait disabled:opacity-60 sm:ml-auto sm:w-auto sm:min-w-64"
               >
-                <span>Decode this address</span>
+                <span>
+                  {isAnalysing ? "Checking your routes…" : "Decode this address"}
+                </span>
                 <span aria-hidden="true">→</span>
               </button>
 
-              <p className="mt-3 text-sm leading-6 text-muted-ink sm:text-right">
-                Analysis connection comes next.
-              </p>
+              {analysisError ? (
+                <p
+                  role="alert"
+                  className="mt-3 text-sm font-medium leading-6 text-transit-coral sm:text-right"
+                >
+                  {analysisError}
+                </p>
+              ) : null}
+
+              {analysisReport ? (
+                <div
+                  role="status"
+                  className="mt-5 border border-border bg-paper p-4 sm:ml-auto sm:max-w-md"
+                >
+                  <p className="font-mono text-xs uppercase tracking-[0.14em] text-moss">
+                    Analysis complete
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-muted-ink">
+                    {analysisReport.summary.analysedAnchors} destinations
+                    analysed · {analysisReport.summary.weeklyTravelHours} hours
+                    of weekly travel
+                  </p>
+                </div>
+              ) : null}
             </div>
           </div>
         </section>
