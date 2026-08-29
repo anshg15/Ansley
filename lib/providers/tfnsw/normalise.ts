@@ -60,6 +60,32 @@ function legCandidates(journey: UnknownRecord) {
   return asArray(firstDefined(journey.legs, journey.leg, journey.itdPartialRouteList)).filter(isRecord);
 }
 
+function legDurationMinutes(leg: UnknownRecord): number | undefined {
+  return leg.durationMinutes === undefined
+    ? minutesFromDuration(leg.duration)
+    : minutesFromDuration(leg.durationMinutes, "minutes");
+}
+
+function journeyDurationMinutes(journey: UnknownRecord): number | undefined {
+  if (journey.durationMinutes !== undefined) {
+    return minutesFromDuration(journey.durationMinutes, "minutes");
+  }
+
+  const directDuration = minutesFromDuration(journey.duration);
+  if (directDuration !== undefined) return directDuration;
+
+  const durations = legCandidates(journey).map(legDurationMinutes);
+  if (durations.length === 0) return undefined;
+
+  let total = 0;
+  for (const duration of durations) {
+    if (duration === undefined) return undefined;
+    total += duration;
+  }
+
+  return total;
+}
+
 function isWalkingLeg(leg: UnknownRecord) {
   const type = stringValue(
     leg.type,
@@ -81,14 +107,10 @@ function modeForLeg(leg: UnknownRecord) {
 
 function normaliseJourney(journey: UnknownRecord, anchorId: string, alternatives: UnknownRecord[]): TransportJourney {
   const legs = legCandidates(journey);
-  const durationMinutes = journey.durationMinutes === undefined
-    ? minutesFromDuration(journey.duration)
-    : minutesFromDuration(journey.durationMinutes, "minutes");
+  const durationMinutes = journeyDurationMinutes(journey);
   const walkingLegs = legs.filter(isWalkingLeg);
   const walkingMinutes = walkingLegs.reduce(
-    (total, leg) => total + (leg.durationMinutes === undefined
-      ? (minutesFromDuration(leg.duration) ?? 0)
-      : (minutesFromDuration(leg.durationMinutes, "minutes") ?? 0)),
+    (total, leg) => total + (legDurationMinutes(leg) ?? 0),
     0,
   );
   const walkingDistanceMetres = walkingLegs.reduce(

@@ -36,3 +36,19 @@ test("treats numeric TfNSW durations as seconds and counts same-mode transfers",
   assert.equal(route.transfers, 1);
   assert.deepEqual(route.modes, ["Bus"]);
 });
+
+test("derives journey duration from TfNSW leg durations when the journey has no top-level duration", () => {
+  const route = normaliseTfnswJourney({
+    journeys: [{
+      legs: [
+        { type: "walk", duration: 420, distance: 520 },
+        { transportation: { product: { name: "Train" } }, duration: 1200 },
+        { type: "walk", duration: 360, distance: 430 },
+      ],
+    }],
+  }, "uni");
+
+  assert.equal(route.durationMinutes, 33);
+  assert.equal(route.walkingMinutes, 13);
+  assert.deepEqual(route.modes, ["Train"]);
+});
