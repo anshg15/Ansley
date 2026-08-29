@@ -5,6 +5,7 @@ import type {
   AnchorCategory,
   Coordinates,
   PropertyProfile,
+  PropertySecurityFeature,
   TimeLensPeriodId,
 } from "./analysis";
 
@@ -49,13 +50,54 @@ function parseProperty(value: unknown): PropertyProfile {
   const dwellingType = property.dwellingType === undefined
     ? undefined
     : asNonEmptyString(property.dwellingType, "Dwelling type");
+  const localGovernmentArea = property.localGovernmentArea === undefined
+    ? undefined
+    : asNonEmptyString(property.localGovernmentArea, "Local government area");
+  const securityFeatures = parseSecurityFeatures(property.securityFeatures);
 
   return {
     address: asNonEmptyString(property.address, "Property address"),
     ...(rentPerWeek === undefined ? {} : { rentPerWeek }),
     ...(coordinates === undefined ? {} : { coordinates }),
     ...(dwellingType === undefined ? {} : { dwellingType }),
+    ...(localGovernmentArea === undefined ? {} : { localGovernmentArea }),
+    ...(securityFeatures === undefined ? {} : { securityFeatures }),
   };
+}
+
+const securityFeatureNames = new Set<PropertySecurityFeature["feature"]>([
+  "controlled-entry",
+  "intercom",
+  "secure-parking",
+  "upper-floor",
+  "street-level-access",
+]);
+const propertyFactSources = new Set<PropertySecurityFeature["source"]>(["listing", "user-confirmed"]);
+
+function parseSecurityFeatures(value: unknown): PropertySecurityFeature[] | undefined {
+  if (value === undefined) return undefined;
+  if (!Array.isArray(value) || value.length > 5) {
+    throw new RequestValidationError("Security features must contain at most five sourced facts.");
+  }
+
+  const features = value.map((item, index) => {
+    if (!item || typeof item !== "object") {
+      throw new RequestValidationError(`Security feature ${index + 1} is invalid.`);
+    }
+    const feature = item as Record<string, unknown>;
+    if (typeof feature.feature !== "string" || !securityFeatureNames.has(feature.feature as PropertySecurityFeature["feature"])) {
+      throw new RequestValidationError(`Security feature ${index + 1} is unsupported.`);
+    }
+    if (typeof feature.source !== "string" || !propertyFactSources.has(feature.source as PropertySecurityFeature["source"])) {
+      throw new RequestValidationError(`Security feature ${index + 1} must identify listing or user-confirmed evidence.`);
+    }
+    return { feature: feature.feature as PropertySecurityFeature["feature"], source: feature.source as PropertySecurityFeature["source"] };
+  });
+
+  if (new Set(features.map((feature) => feature.feature)).size !== features.length) {
+    throw new RequestValidationError("Security features must not contain duplicates.");
+  }
+  return features;
 }
 
 function parseCoordinates(value: unknown): Coordinates | undefined {

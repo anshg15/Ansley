@@ -8,6 +8,8 @@ const validRequest = {
     rentPerWeek: 720,
     coordinates: { latitude: -33.897, longitude: 151.179 },
     dwellingType: "Apartment",
+    localGovernmentArea: "Inner West",
+    securityFeatures: [{ feature: "controlled-entry", source: "listing" }],
   },
   anchors: [
     {
@@ -44,5 +46,18 @@ test("accepts a capped TimeLens selection and rejects unknown anchors", () => {
   assert.throws(
     () => parseAnalysisRequest({ ...validRequest, options: { timeLens: { anchorIds: ["unknown"] } } }),
     /can only analyse anchors included/,
+  );
+});
+
+test("preserves sourced property security facts and rejects unsupported or duplicate claims", () => {
+  const request = parseAnalysisRequest(validRequest);
+  assert.deepEqual(request.property.securityFeatures, [{ feature: "controlled-entry", source: "listing" }]);
+  assert.throws(
+    () => parseAnalysisRequest({ ...validRequest, property: { ...validRequest.property, securityFeatures: [{ feature: "controlled-entry", source: "listing" }, { feature: "controlled-entry", source: "user-confirmed" }] } }),
+    /must not contain duplicates/,
+  );
+  assert.throws(
+    () => parseAnalysisRequest({ ...validRequest, property: { ...validRequest.property, securityFeatures: [{ feature: "doorman", source: "listing" }] } }),
+    /is unsupported/,
   );
 });

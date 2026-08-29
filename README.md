@@ -28,6 +28,12 @@ npm run build
 
 The tests live beside the domain, analysis, provider, and route-handler code. They use mocked TfNSW responses, so they run without API credentials or network access.
 
+## Optional safety context
+
+The analysis response can include a source-labelled Safety Context. When a request supplies `property.localGovernmentArea`, the server reads BOCSAR's official LGA rankings workbook and returns only factual area observations (offence and rate per 100,000). It never produces a safe/unsafe score or a prediction about an individual dwelling or person.
+
+Property characteristics must be supplied as sourced facts in `property.securityFeatures`, for example `{ "feature": "controlled-entry", "source": "listing" }`. The optional `BOCSAR_LGA_RANKINGS_URL` override is restricted to official BOCSAR hosts so the adapter remains auditable and removable.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

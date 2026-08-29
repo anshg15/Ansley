@@ -1,6 +1,7 @@
 import { analyseAddressTruth } from "@/lib/analysis/analyse";
 import { RequestValidationError, parseAnalysisRequest } from "@/lib/domain/validation";
 import { TfnswClient } from "@/lib/providers/tfnsw/client";
+import { BocsarClient } from "@/lib/providers/bocsar/client";
 
 export const runtime = "nodejs";
 
@@ -14,7 +15,7 @@ export async function POST(request: Request) {
 
   try {
     const analysisRequest = parseAnalysisRequest(body);
-    const report = await analyseAddressTruth(analysisRequest, new TfnswClient());
+    const report = await analyseAddressTruth(analysisRequest, new TfnswClient(), new BocsarClient());
     return Response.json(report);
   } catch (error) {
     if (error instanceof RequestValidationError) {

@@ -3,6 +3,7 @@ import { calculateRoutineFit } from "./routine-fit";
 import { analyseShadowCommutes } from "./shadow-commute";
 import { analyseTimeLens, isTimeLensEnabled } from "./time-lens";
 import { calculateTotalWeeklyTravelMinutes, calculateWeeklyTravelMinutes } from "./weekly-burden";
+import { buildSafetyContext } from "./safety-context";
 import type {
   AddressTruthReport,
   AnalysedAnchor,
@@ -11,6 +12,7 @@ import type {
   RepresentativeDeparture,
   RouteAnalysis,
 } from "@/lib/domain/analysis";
+import type { SafetyProvider } from "@/lib/providers/bocsar/client";
 
 export type TransportProvider = {
   analyseJourney(originAddress: string, destinationAddress: string, anchorId: string): Promise<RouteAnalysis>;
@@ -46,6 +48,7 @@ async function mapWithConcurrency<T, R>(
 export async function analyseAddressTruth(
   request: AnalysisRequest,
   transportProvider: TransportProvider,
+  safetyProvider?: SafetyProvider,
 ): Promise<AddressTruthReport> {
   const outcomes = await mapWithConcurrency(request.anchors, MAX_CONCURRENT_ROUTE_REQUESTS, async (anchor) => {
     try {
@@ -77,6 +80,7 @@ export async function analyseAddressTruth(
   const routineFit = calculateRoutineFit(anchors);
   const timeLens = await analyseTimeLens(request.property.address, anchors, request.options, transportProvider);
   const shadowCommutes = analyseShadowCommutes(anchors);
+  const safetyContext = await buildSafetyContext(request.property, anchors, safetyProvider);
 
   return {
     property: request.property,
@@ -104,7 +108,11 @@ export async function analyseAddressTruth(
         ? { status: "available" }
         : { status: "unavailable", message: "Route-fragility analysis requires a primary route." },
       amenities: { status: "unavailable", message: "Everyday access analysis has not been enabled yet." },
+      safety: safetyContext.area.status === "available"
+        ? { status: "available" }
+        : { status: "unavailable", message: safetyContext.area.message },
     },
+    safetyContext,
     generatedAt: new Date().toISOString(),
   };
 }

@@ -8,6 +8,13 @@ export type PropertyProfile = {
   rentPerWeek?: number;
   coordinates?: Coordinates;
   dwellingType?: string;
+  localGovernmentArea?: string;
+  securityFeatures?: PropertySecurityFeature[];
+};
+
+export type PropertySecurityFeature = {
+  feature: "controlled-entry" | "intercom" | "secure-parking" | "upper-floor" | "street-level-access";
+  source: "listing" | "user-confirmed";
 };
 
 export type AnchorCategory = "work" | "education" | "health" | "social" | "exercise" | "other";
@@ -114,6 +121,35 @@ export type ShadowCommuteResult = {
 
 export type ModuleStatus = "available" | "unavailable";
 
+export type SafetySource = {
+  label: "official-data" | "listing-derived" | "user-confirmed" | "addresstruth-heuristic";
+  name: string;
+  url?: string;
+  dataPeriod?: string;
+};
+
+export type SafetyContext = {
+  area: {
+    status: ModuleStatus;
+    localGovernmentArea?: string;
+    observations: Array<{
+      offence: string;
+      ratePer100k: number;
+      source: SafetySource;
+    }>;
+    message?: string;
+  };
+  property: Array<{
+    text: string;
+    source: SafetySource;
+  }>;
+  routine: Array<{
+    text: string;
+    source: SafetySource;
+  }>;
+  disclaimer: string;
+};
+
 export type AddressTruthReport = {
   property: PropertyProfile;
   anchors: AnalysedAnchor[];
@@ -132,6 +168,8 @@ export type AddressTruthReport = {
     timeLens: { status: ModuleStatus; message?: string };
     shadowCommute: { status: ModuleStatus; message?: string };
     amenities: { status: ModuleStatus; message?: string };
+    safety: { status: ModuleStatus; message?: string };
   };
+  safetyContext: SafetyContext;
   generatedAt: string;
 };
