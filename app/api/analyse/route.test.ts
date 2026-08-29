@@ -47,7 +47,7 @@ test("keeps the report usable when live TfNSW configuration is absent", async ()
 
     const report = await response.json();
     assert.equal(response.status, 200);
-    assert.equal(report.modules.transport.status, "unavailable");
+    assert.equal(report.routes.length, 0);
     assert.equal(report.failedAnchors[0].message, "Live transport analysis is not configured yet.");
   } finally {
     if (previousKey === undefined) delete process.env.TFNSW_API_KEY;

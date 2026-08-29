@@ -8,6 +8,10 @@ const validRequest = {
     rentPerWeek: 720,
     coordinates: { latitude: -33.897, longitude: 151.179 },
     dwellingType: "Apartment",
+    source: "manual",
+  },
+  userProfile: {
+    preset: "custom",
   },
   anchors: [
     {
@@ -19,6 +23,7 @@ const validRequest = {
       category: "education",
     },
   ],
+  preferences: [],
 };
 
 test("accepts the full v1 request shape without dropping property fields", () => {

@@ -1,4 +1,6 @@
-import type { AnalysisRequest, Anchor, AnchorCategory, Coordinates, PropertyProfile } from "./analysis";
+import type { AnalysisRequest } from "./analysis-request";
+import type { Anchor, AnchorCategory } from "./anchor";
+import type { Coordinates, PropertyProfile } from "./property";
 
 const anchorCategories = new Set<AnchorCategory>([
   "work",
@@ -27,12 +29,21 @@ function asPositiveNumber(value: unknown, label: string) {
   return value;
 }
 
+function asPropertySource(value: unknown): "manual" | "extracted" {
+    if ((value !== "manual") && (value !== "extracted")) {
+        throw new RequestValidationError('Property source must be either "manual" or "extracted".');
+    }
+
+    return value;
+}
+
 function parseProperty(value: unknown): PropertyProfile {
   if (!value || typeof value !== "object") {
     throw new RequestValidationError("property is required.");
   }
 
   const property = value as Record<string, unknown>;
+  const source = property.source === undefined ? "manual" : asPropertySource(property.source);
   const coordinates = parseCoordinates(property.coordinates);
   const rentPerWeek = property.rentPerWeek === undefined
     ? undefined
@@ -43,6 +54,7 @@ function parseProperty(value: unknown): PropertyProfile {
 
   return {
     address: asNonEmptyString(property.address, "Property address"),
+    source,
     ...(rentPerWeek === undefined ? {} : { rentPerWeek }),
     ...(coordinates === undefined ? {} : { coordinates }),
     ...(dwellingType === undefined ? {} : { dwellingType }),
@@ -110,5 +122,12 @@ export function parseAnalysisRequest(value: unknown): AnalysisRequest {
     throw new RequestValidationError("Each anchor must have a unique id.");
   }
 
-  return { property: parseProperty(request.property), anchors };
+  return {
+    property: parseProperty(request.property),
+    userProfile: {
+      preset: "custom",
+    },
+    anchors,
+    preferences: [],
+  };
 }

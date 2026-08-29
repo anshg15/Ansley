@@ -1,6 +1,7 @@
-import type { AnalysedAnchor, RoutineFit } from "@/lib/domain/analysis";
+import type { AnalysedAnchor } from "@/lib/domain/analysed-anchor";
+import type { RoutineFitResult } from "@/lib/domain/routine-fit";
 
-export function calculateRoutineFit(anchors: AnalysedAnchor[]): RoutineFit | null {
+export function calculateRoutineFit(anchors: AnalysedAnchor[]): RoutineFitResult | null {
   const totalVisitsPerWeek = anchors.reduce((total, anchor) => total + anchor.visitsPerWeek, 0);
   if (totalVisitsPerWeek === 0) {
     return null;

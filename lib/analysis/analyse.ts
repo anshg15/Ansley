@@ -1,16 +1,16 @@
 import { generateCoreInsights } from "./insights";
 import { calculateRoutineFit } from "./routine-fit";
 import { calculateTotalWeeklyTravelMinutes, calculateWeeklyTravelMinutes } from "./weekly-burden";
-import type {
-  AddressTruthReport,
-  AnalysedAnchor,
-  AnalysisRequest,
-  FailedAnchor,
-  RouteAnalysis,
-} from "@/lib/domain/analysis";
+import type { AnalysedAnchor } from "@/lib/domain/analysed-anchor";
+import type { AnalysisRequest } from "@/lib/domain/analysis-request";
+import type { TransportJourney } from "@/lib/domain/transport-journey";
+import { buildRouteAnalysis } from "./build-route-analysis";
+import type { AddressTruthReport } from "@/lib/domain/address-truth-report";
+import type { FailedAnchor } from "@/lib/domain/failed-anchor";
+import build from "next/dist/build";
 
 export type TransportProvider = {
-  analyseJourney(originAddress: string, destinationAddress: string, anchorId: string): Promise<RouteAnalysis>;
+  analyseJourney(originAddress: string, destinationAddress: string, anchorId: string): Promise<TransportJourney>;
 };
 
 const MAX_CONCURRENT_ROUTE_REQUESTS = 2;
@@ -66,26 +66,19 @@ export async function analyseAddressTruth(
     .map((outcome) => outcome.failed);
   const weeklyTravelMinutes = calculateTotalWeeklyTravelMinutes(anchors);
   const routineFit = calculateRoutineFit(anchors);
+  const routes = anchors.map((anchor) => buildRouteAnalysis(anchor.route, anchor),);
 
   return {
     property: request.property,
-    anchors,
-    failedAnchors,
     summary: {
       weeklyTravelMinutes,
       weeklyTravelHours: Math.round((weeklyTravelMinutes / 60) * 10) / 10,
       analysedAnchors: anchors.length,
     },
+    routes,
+    failedAnchors,
     routineFit,
     insights: generateCoreInsights(anchors, routineFit),
-    modules: {
-      transport: anchors.length > 0
-        ? { status: "available" }
-        : { status: "unavailable", message: "Live transport analysis is temporarily unavailable." },
-      timeLens: { status: "unavailable", message: "Time-based analysis has not been enabled yet." },
-      shadowCommute: { status: "unavailable", message: "Route-fragility analysis has not been enabled yet." },
-      amenities: { status: "unavailable", message: "Everyday access analysis has not been enabled yet." },
-    },
     generatedAt: new Date().toISOString(),
   };
 }

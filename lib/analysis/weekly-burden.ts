@@ -1,4 +1,4 @@
-import type { AnalysedAnchor } from "@/lib/domain/analysis";
+import type { AnalysedAnchor } from "@/lib/domain/analysed-anchor";
 
 export function calculateWeeklyTravelMinutes(
   durationMinutes: number,

@@ -1,4 +1,4 @@
-import type { RouteAnalysis } from "@/lib/domain/analysis";
+import type { TransportJourney } from "@/lib/domain/transport-journey";
 import { normaliseTfnswJourney } from "./normalise";
 
 const TFNSW_API_BASE_URL = "https://api.transport.nsw.gov.au/v1/tp";
@@ -68,7 +68,7 @@ export class TfnswClient {
     private readonly baseUrl = TFNSW_API_BASE_URL,
   ) {}
 
-  async analyseJourney(originAddress: string, destinationAddress: string, anchorId: string): Promise<RouteAnalysis> {
+  async analyseJourney(originAddress: string, destinationAddress: string, anchorId: string): Promise<TransportJourney> {
     const [origin, destination] = await Promise.all([
       this.findLocation(originAddress),
       this.findLocation(destinationAddress),
