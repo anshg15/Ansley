@@ -1,6 +1,34 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 
+import { AnchorEditor } from "@/app/components/anchor-editor";
+
 export default function Home() {
+  const [propertyAddress, setPropertyAddress] = useState("");
+  const [propertyError, setPropertyError] = useState("");
+  const [showRoutine, setShowRoutine] = useState(false);
+
+  function handlePropertySubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!propertyAddress.trim()) {
+      setPropertyError("Enter the property address you want to decode.");
+      return;
+    }
+
+    setPropertyError("");
+    setShowRoutine(true);
+
+    requestAnimationFrame(() => {
+      document.getElementById("routine")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  }
+
   return (
     <main className="min-h-screen bg-parchment text-ink">
       <header className="border-b border-border">
@@ -80,7 +108,7 @@ export default function Home() {
               </span>
             </div>
 
-            <form className="mt-7">
+            <form className="mt-7" onSubmit={handlePropertySubmit}>
               <label
                 htmlFor="property-address"
                 className="block text-sm font-medium"
@@ -100,16 +128,43 @@ export default function Home() {
                 name="propertyAddress"
                 type="text"
                 autoComplete="street-address"
-                aria-describedby="property-address-help"
+                aria-describedby={
+                  propertyError
+                    ? "property-address-help property-address-error"
+                    : "property-address-help"
+                }
+                aria-invalid={propertyError ? true : undefined}
+                value={propertyAddress}
+                onChange={(event) => {
+                  setPropertyAddress(event.target.value);
+
+                  if (propertyError) {
+                    setPropertyError("");
+                  }
+                }}
                 placeholder="e.g. 42 King Street, Newtown NSW"
                 className="mt-4 w-full border border-border bg-paper px-4 py-3.5 text-base text-ink outline-none transition-colors placeholder:text-muted-ink/60 focus:border-moss"
               />
 
+              {propertyError ? (
+                <p
+                  id="property-address-error"
+                  role="alert"
+                  className="mt-2 text-sm font-medium text-transit-coral"
+                >
+                  {propertyError}
+                </p>
+              ) : null}
+
               <button
-                type="button"
+                type="submit"
                 className="mt-6 flex w-full items-center justify-between bg-ink px-5 py-4 text-left text-sm font-semibold text-paper transition-opacity hover:opacity-90"
               >
-                <span>Continue to your routine</span>
+                <span>
+                  {showRoutine
+                    ? "Continue to your routine"
+                    : "Continue to your routine"}
+                </span>
                 <span aria-hidden="true">→</span>
               </button>
             </form>
@@ -139,6 +194,31 @@ export default function Home() {
           </section>
         </div>
       </section>
+
+      {showRoutine ? (
+        <section
+          id="routine"
+          className="scroll-mt-6 border-t border-border bg-paper/40"
+        >
+          <div className="mx-auto w-full max-w-6xl px-5 py-14 sm:px-8 sm:py-16 lg:px-10">
+            <AnchorEditor />
+
+            <div className="mt-8 border-t border-border pt-6">
+              <button
+                type="button"
+                className="flex w-full items-center justify-between bg-moss px-5 py-4 text-left text-sm font-semibold text-paper transition-opacity hover:opacity-90 sm:ml-auto sm:w-auto sm:min-w-64"
+              >
+                <span>Decode this address</span>
+                <span aria-hidden="true">→</span>
+              </button>
+
+              <p className="mt-3 text-sm leading-6 text-muted-ink sm:text-right">
+                Analysis connection comes next.
+              </p>
+            </div>
+          </div>
+        </section>
+      ) : null}
     </main>
   );
 }
