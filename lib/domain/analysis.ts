@@ -10,6 +10,7 @@ export type PropertyProfile = {
   dwellingType?: string;
   localGovernmentArea?: string;
   securityFeatures?: PropertySecurityFeature[];
+  source?: "manual" | "extracted";
 };
 
 export type PropertySecurityFeature = {
@@ -32,6 +33,8 @@ export type AnalysisRequest = {
   property: PropertyProfile;
   anchors: Anchor[];
   options?: AnalysisOptions;
+  userProfile?: UserProfile;
+  preferences?: LifestylePreference[];
 };
 
 export type TimeLensPeriodId = "weekday-morning" | "weekday-evening";
@@ -80,12 +83,14 @@ export type RoutineFit = {
   explanation: string;
 };
 
-export type InsightSeverity = "positive" | "warning" | "neutral";
+export type InsightSeverity = "positive" | "info" | "warning";
 
 export type Insight = {
-  type: "routine-fit" | "weekly-burden" | "travel-tolerance";
+  id: string;
+  type: "route" | "routine-fit" | "time-lens" | "shadow-commute" | "amenity" | "community-access" | "safety" | "general";
   title: string;
-  text: string;
+  explanation: string;
+  evidence: string[];
   severity: InsightSeverity;
 };
 
@@ -155,6 +160,7 @@ export type SafetyContext = {
 export type AddressTruthReport = {
   property: PropertyProfile;
   anchors: AnalysedAnchor[];
+  routes: ReportRouteAnalysis[];
   failedAnchors: FailedAnchor[];
   summary: {
     weeklyTravelMinutes: number;
@@ -175,3 +181,6 @@ export type AddressTruthReport = {
   safetyContext: SafetyContext;
   generatedAt: string;
 };
+import type { LifestylePreference } from "./lifestyle-preference";
+import type { RouteAnalysis as ReportRouteAnalysis } from "./route-analysis";
+import type { UserProfile } from "./user-profile";

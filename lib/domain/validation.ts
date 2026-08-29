@@ -37,12 +37,21 @@ function asPositiveNumber(value: unknown, label: string) {
   return value;
 }
 
+function asPropertySource(value: unknown): "manual" | "extracted" {
+    if ((value !== "manual") && (value !== "extracted")) {
+        throw new RequestValidationError('Property source must be either "manual" or "extracted".');
+    }
+
+    return value;
+}
+
 function parseProperty(value: unknown): PropertyProfile {
   if (!value || typeof value !== "object") {
     throw new RequestValidationError("property is required.");
   }
 
   const property = value as Record<string, unknown>;
+  const source = property.source === undefined ? "manual" : asPropertySource(property.source);
   const coordinates = parseCoordinates(property.coordinates);
   const rentPerWeek = property.rentPerWeek === undefined
     ? undefined
@@ -57,6 +66,7 @@ function parseProperty(value: unknown): PropertyProfile {
 
   return {
     address: asNonEmptyString(property.address, "Property address"),
+    source,
     ...(rentPerWeek === undefined ? {} : { rentPerWeek }),
     ...(coordinates === undefined ? {} : { coordinates }),
     ...(dwellingType === undefined ? {} : { dwellingType }),
@@ -161,7 +171,9 @@ export function parseAnalysisRequest(value: unknown): AnalysisRequest {
     throw new RequestValidationError("Each anchor must have a unique id.");
   }
 
-  return { property: parseProperty(request.property), anchors, ...(request.options === undefined ? {} : { options: parseOptions(request.options, anchors) }) };
+  const userProfile = parseUserProfile(request.userProfile);
+  const preferences = parsePreferences(request.preferences);
+  return { property: parseProperty(request.property), anchors, userProfile, preferences, ...(request.options === undefined ? {} : { options: parseOptions(request.options, anchors) }) };
 }
 
 function parseOptions(value: unknown, anchors: Anchor[]): AnalysisOptions {
@@ -199,4 +211,18 @@ function parseStringList(value: unknown, label: string, maxLength: number): stri
     throw new RequestValidationError(`${label} must not contain duplicates.`);
   }
   return values;
+}
+
+function parseUserProfile(value: unknown) {
+  if (value === undefined) return { preset: "custom" as const };
+  if (!value || typeof value !== "object" || !["student", "professional", "family", "custom"].includes((value as Record<string, unknown>).preset as string)) {
+    throw new RequestValidationError("User profile preset is unsupported.");
+  }
+  return { preset: (value as { preset: "student" | "professional" | "family" | "custom" }).preset };
+}
+
+function parsePreferences(value: unknown) {
+  if (value === undefined) return [];
+  if (!Array.isArray(value)) throw new RequestValidationError("Preferences must be an array.");
+  return value as AnalysisRequest["preferences"] extends infer Preferences ? NonNullable<Preferences> : never;
 }

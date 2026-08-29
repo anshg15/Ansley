@@ -10,6 +10,10 @@ const validRequest = {
     dwellingType: "Apartment",
     localGovernmentArea: "Inner West",
     securityFeatures: [{ feature: "controlled-entry", source: "listing" }],
+    source: "manual",
+  },
+  userProfile: {
+    preset: "custom",
   },
   anchors: [
     {
@@ -21,6 +25,7 @@ const validRequest = {
       category: "education",
     },
   ],
+  preferences: [],
 };
 
 test("accepts the full v1 request shape without dropping property fields", () => {

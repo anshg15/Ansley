@@ -1,4 +1,4 @@
-import type { RouteAnalysis } from "@/lib/domain/analysis";
+import type { TransportJourney } from "@/lib/domain/transport-journey";
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -79,7 +79,7 @@ function modeForLeg(leg: UnknownRecord) {
   );
 }
 
-function normaliseJourney(journey: UnknownRecord, anchorId: string, alternatives: UnknownRecord[]): RouteAnalysis {
+function normaliseJourney(journey: UnknownRecord, anchorId: string, alternatives: UnknownRecord[]): TransportJourney {
   const legs = legCandidates(journey);
   const durationMinutes = journey.durationMinutes === undefined
     ? minutesFromDuration(journey.duration)
@@ -120,7 +120,7 @@ function normaliseJourney(journey: UnknownRecord, anchorId: string, alternatives
   };
 }
 
-export function normaliseTfnswJourney(payload: unknown, anchorId: string): RouteAnalysis {
+export function normaliseTfnswJourney(payload: unknown, anchorId: string): TransportJourney {
   const journeys = journeyCandidates(payload);
   if (journeys.length === 0) {
     throw new Error("TfNSW did not return a journey for this address.");
