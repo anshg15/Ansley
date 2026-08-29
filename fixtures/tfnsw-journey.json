@@ -1,0 +1,33 @@
+{
+  "journeys": [
+    {
+      "duration": 1980,
+      "departureTime": "2026-08-29T08:00:00+10:00",
+      "arrivalTime": "2026-08-29T08:33:00+10:00",
+      "legs": [
+        {
+          "type": "walk",
+          "duration": 420,
+          "distance": 520
+        },
+        {
+          "transportation": {
+            "product": {
+              "name": "Train"
+            }
+          },
+          "duration": 1200
+        },
+        {
+          "type": "walk",
+          "duration": 360,
+          "distance": 430
+        }
+      ]
+    },
+    {
+      "duration": 2460,
+      "legs": []
+    }
+  ]
+}
