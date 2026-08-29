@@ -126,6 +126,8 @@ export type SafetySource = {
   name: string;
   url?: string;
   dataPeriod?: string;
+  retrievedAt?: string;
+  freshness?: "current" | "stale";
 };
 
 export type SafetyContext = {

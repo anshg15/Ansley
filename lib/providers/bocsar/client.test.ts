@@ -19,6 +19,7 @@ function workbookResponse(sheetName: string, rows: unknown[][]) {
 }
 
 test("reads BOCSAR's published ranking-sheet layout and uses its most recent period", async () => {
+  BocsarClient.clearCacheForTests();
   const client = new BocsarClient(async () => workbookResponse("Property crime", [["NSW Recorded Crime Statistics"], [], ["Area rankings"], [], [undefined, "Apr 2024 - Mar 2025", undefined, undefined, "Apr 2025 - Mar 2026"], ["LGA of incident", "Count", "Rate per 100,000 population", "Rank", "Count", "Rate per 100,000 population", "Rank"], ["Inner West", 100, 82.1, 20, 120, 93.7, 18]]));
   const context = await client.getAreaContext("Inner West");
   assert.deepEqual(context.observations, [{ offence: "Property crime", ratePer100k: 93.7, dataPeriod: "Apr 2025 - Mar 2026" }]);
@@ -27,4 +28,31 @@ test("reads BOCSAR's published ranking-sheet layout and uses its most recent per
 test("rejects a non-BOCSAR workbook URL", async () => {
   const client = new BocsarClient(async () => workbookResponse("Property crime", []), "https://example.com/data.xlsx");
   await assert.rejects(() => client.getAreaContext("Inner West"), /official BOCSAR source URL/);
+});
+
+test("uses fresh cached data and labels expired cached data as stale when refresh fails", async () => {
+  BocsarClient.clearCacheForTests();
+  let now = new Date("2026-08-29T00:00:00.000Z");
+  let calls = 0;
+  const client = new BocsarClient(async () => {
+    calls += 1;
+    return calls === 1
+      ? workbookResponse("Property crime", [["Title"], [], ["Area"], [], [undefined, "Apr 2025 - Mar 2026"], ["LGA of incident", "Count", "Rate per 100,000 population"], ["Inner West", 1, 93.7]])
+      : new Response(null, { status: 503 });
+  }, undefined, { now: () => now, cacheTtlMs: 1_000 });
+
+  assert.equal((await client.getAreaContext("Inner West")).freshness, "current");
+  assert.equal((await client.getAreaContext("Inner West")).freshness, "current");
+  assert.equal(calls, 1);
+  now = new Date("2026-08-29T00:00:02.000Z");
+  const stale = await client.getAreaContext("Inner West");
+  assert.equal(stale.freshness, "stale");
+  assert.equal(stale.retrievedAt, "2026-08-29T00:00:00.000Z");
+  assert.equal(calls, 2);
+});
+
+test("does not manufacture area context when no cached data exists", async () => {
+  BocsarClient.clearCacheForTests();
+  const client = new BocsarClient(async () => new Response(null, { status: 503 }));
+  await assert.rejects(() => client.getAreaContext("Inner West"), /temporarily unavailable/);
 });

@@ -13,6 +13,7 @@ import type {
   RouteAnalysis,
 } from "@/lib/domain/analysis";
 import type { SafetyProvider } from "@/lib/providers/bocsar/client";
+import type { LgaProvider } from "@/lib/providers/nsw/lga";
 
 export type TransportProvider = {
   analyseJourney(originAddress: string, destinationAddress: string, anchorId: string): Promise<RouteAnalysis>;
@@ -49,6 +50,7 @@ export async function analyseAddressTruth(
   request: AnalysisRequest,
   transportProvider: TransportProvider,
   safetyProvider?: SafetyProvider,
+  lgaProvider?: LgaProvider,
 ): Promise<AddressTruthReport> {
   const outcomes = await mapWithConcurrency(request.anchors, MAX_CONCURRENT_ROUTE_REQUESTS, async (anchor) => {
     try {
@@ -80,7 +82,7 @@ export async function analyseAddressTruth(
   const routineFit = calculateRoutineFit(anchors);
   const timeLens = await analyseTimeLens(request.property.address, anchors, request.options, transportProvider);
   const shadowCommutes = analyseShadowCommutes(anchors);
-  const safetyContext = await buildSafetyContext(request.property, anchors, safetyProvider);
+  const safetyContext = await buildSafetyContext(request.property, anchors, safetyProvider, lgaProvider);
 
   return {
     property: request.property,

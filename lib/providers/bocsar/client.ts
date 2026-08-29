@@ -1,10 +1,18 @@
 import { strFromU8, unzipSync } from "fflate";
+import { fetchWithTimeout } from "@/lib/providers/http";
 
 const BOCSAR_LGA_RANKINGS_URL = "https://bocsar.nsw.gov.au/content/dam/dcj/bocsar/documents/open-datasets/LGA_ranking_for_violent_and_property_offences.xlsx";
 const BOCSAR_DATASET_PAGE = "https://bocsar.nsw.gov.au/statistics-dashboards/open-datasets/local-area-rankings.html";
 
 export type BocsarAreaObservation = { offence: string; ratePer100k: number; dataPeriod?: string };
-export type BocsarAreaContext = { localGovernmentArea: string; sourceName: string; sourceUrl: string; observations: BocsarAreaObservation[] };
+export type BocsarAreaContext = {
+  localGovernmentArea: string;
+  sourceName: string;
+  sourceUrl: string;
+  observations: BocsarAreaObservation[];
+  retrievedAt: string;
+  freshness: "current" | "stale";
+};
 export type SafetyProvider = { getAreaContext(localGovernmentArea: string): Promise<BocsarAreaContext> };
 type Fetcher = typeof fetch;
 
@@ -65,18 +73,51 @@ function parseRankingSheet(sheetName: string, rows: unknown[][], requestedLga: s
   });
 }
 
+type BocsarClientOptions = { now?: () => Date; cacheTtlMs?: number; maxCacheEntries?: number; timeoutMs?: number };
+type CacheEntry = { context: BocsarAreaContext; expiresAt: number };
+
 export class BocsarClient implements SafetyProvider {
-  constructor(private readonly fetcher: Fetcher = fetch, private readonly workbookUrl = process.env.BOCSAR_LGA_RANKINGS_URL ?? BOCSAR_LGA_RANKINGS_URL) {}
+  private static readonly cache = new Map<string, CacheEntry>();
+  private readonly now: () => Date;
+  private readonly cacheTtlMs: number;
+  private readonly maxCacheEntries: number;
+  private readonly timeoutMs: number;
+
+  constructor(
+    private readonly fetcher: Fetcher = fetch,
+    private readonly workbookUrl = process.env.BOCSAR_LGA_RANKINGS_URL ?? BOCSAR_LGA_RANKINGS_URL,
+    options: BocsarClientOptions = {},
+  ) {
+    this.now = options.now ?? (() => new Date());
+    this.cacheTtlMs = options.cacheTtlMs ?? 6 * 60 * 60 * 1_000;
+    this.maxCacheEntries = options.maxCacheEntries ?? 24;
+    this.timeoutMs = options.timeoutMs ?? 10_000;
+  }
+
+  static clearCacheForTests() { BocsarClient.cache.clear(); }
+
   async getAreaContext(localGovernmentArea: string): Promise<BocsarAreaContext> {
     const url = new URL(this.workbookUrl);
     if (!isOfficialBocsarUrl(url)) throw new Error("BOCSAR safety data must use an official BOCSAR source URL.");
-    const response = await this.fetcher(url, { cache: "no-store" });
-    if (!response.ok) throw new Error("Official BOCSAR area context is temporarily unavailable.");
-    const files = unzipSync(new Uint8Array(await response.arrayBuffer()));
-    const sharedStrings = parseSharedStrings(files["xl/sharedStrings.xml"] && strFromU8(files["xl/sharedStrings.xml"]));
-    const requestedLga = normaliseLga(localGovernmentArea);
-    const observations = workbookSheets(files).flatMap((sheet) => parseRankingSheet(sheet.name, parseSheetRows(sheet.xml, sharedStrings), requestedLga));
-    if (observations.length === 0) throw new Error("Official BOCSAR data did not include this local government area.");
-    return { localGovernmentArea, sourceName: "NSW BOCSAR local area rankings", sourceUrl: BOCSAR_DATASET_PAGE, observations };
+    const cacheKey = `${url.toString()}:${normaliseLga(localGovernmentArea)}`;
+    const cached = BocsarClient.cache.get(cacheKey);
+    if (cached && cached.expiresAt > this.now().getTime()) return cached.context;
+
+    try {
+      const response = await fetchWithTimeout(this.fetcher, url, { cache: "no-store" }, this.timeoutMs);
+      if (!response.ok) throw new Error("Official BOCSAR area context is temporarily unavailable.");
+      const files = unzipSync(new Uint8Array(await response.arrayBuffer()));
+      const sharedStrings = parseSharedStrings(files["xl/sharedStrings.xml"] && strFromU8(files["xl/sharedStrings.xml"]));
+      const requestedLga = normaliseLga(localGovernmentArea);
+      const observations = workbookSheets(files).flatMap((sheet) => parseRankingSheet(sheet.name, parseSheetRows(sheet.xml, sharedStrings), requestedLga));
+      if (observations.length === 0) throw new Error("Official BOCSAR data did not include this local government area.");
+      const context: BocsarAreaContext = { localGovernmentArea, sourceName: "NSW BOCSAR local area rankings", sourceUrl: BOCSAR_DATASET_PAGE, observations, retrievedAt: this.now().toISOString(), freshness: "current" };
+      if (BocsarClient.cache.size >= this.maxCacheEntries) BocsarClient.cache.delete(BocsarClient.cache.keys().next().value as string);
+      BocsarClient.cache.set(cacheKey, { context, expiresAt: this.now().getTime() + this.cacheTtlMs });
+      return context;
+    } catch (error) {
+      if (cached) return { ...cached.context, freshness: "stale" };
+      throw error instanceof Error && error.message.startsWith("Official BOCSAR") ? error : new Error("Official BOCSAR area context is temporarily unavailable.");
+    }
   }
 }

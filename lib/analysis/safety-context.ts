@@ -5,6 +5,7 @@ import type {
   SafetySource,
 } from "@/lib/domain/analysis";
 import type { SafetyProvider } from "@/lib/providers/bocsar/client";
+import type { LgaProvider } from "@/lib/providers/nsw/lga";
 
 const officialSource = (name: string, url: string, dataPeriod?: string): SafetySource => ({
   label: "official-data",
@@ -25,6 +26,7 @@ export async function buildSafetyContext(
   property: PropertyProfile,
   anchors: AnalysedAnchor[],
   provider?: SafetyProvider,
+  lgaProvider?: LgaProvider,
 ): Promise<SafetyContext> {
   const propertyFacts = (property.securityFeatures ?? []).map((item) => ({
     text: featureText[item.feature],
@@ -49,7 +51,10 @@ export async function buildSafetyContext(
       area: { status: "unavailable", observations: [], message: "Official BOCSAR area context has not been enabled." },
     };
   }
-  if (!property.localGovernmentArea) {
+  const resolvedLga = property.localGovernmentArea ?? (property.coordinates && lgaProvider
+    ? await lgaProvider.resolveLga(property.coordinates)
+    : null);
+  if (!resolvedLga) {
     return {
       ...base,
       area: { status: "unavailable", observations: [], message: "Add the local government area to request official BOCSAR area context." },
@@ -57,7 +62,7 @@ export async function buildSafetyContext(
   }
 
   try {
-    const area = await provider.getAreaContext(property.localGovernmentArea);
+    const area = await provider.getAreaContext(resolvedLga);
     return {
       ...base,
       area: {
@@ -66,7 +71,7 @@ export async function buildSafetyContext(
         observations: area.observations.map((observation) => ({
           offence: observation.offence,
           ratePer100k: observation.ratePer100k,
-          source: officialSource(area.sourceName, area.sourceUrl, observation.dataPeriod),
+          source: { ...officialSource(area.sourceName, area.sourceUrl, observation.dataPeriod), retrievedAt: area.retrievedAt, freshness: area.freshness },
         })),
       },
     };

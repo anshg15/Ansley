@@ -30,9 +30,15 @@ The tests live beside the domain, analysis, provider, and route-handler code. Th
 
 ## Optional safety context
 
-The analysis response can include a source-labelled Safety Context. When a request supplies `property.localGovernmentArea`, the server reads BOCSAR's official LGA rankings workbook and returns only factual area observations (offence and rate per 100,000). It never produces a safe/unsafe score or a prediction about an individual dwelling or person.
+The analysis response can include a source-labelled Safety Context. The server reads BOCSAR's official LGA rankings workbook and returns only factual area observations (offence and rate per 100,000). It uses a supplied `property.localGovernmentArea` as an explicit override; otherwise, it may resolve validated NSW property coordinates through the official NSW spatial boundary service. It never produces a safe/unsafe score or a prediction about an individual dwelling or person.
 
 Property characteristics must be supplied as sourced facts in `property.securityFeatures`, for example `{ "feature": "controlled-entry", "source": "listing" }`. The optional `BOCSAR_LGA_RANKINGS_URL` override is restricted to official BOCSAR hosts so the adapter remains auditable and removable.
+
+Successful BOCSAR reads are cached server-side for six hours. If a refresh later fails, the response marks the previously retrieved official observations as `stale`; if no data has been retrieved, the Safety Context remains unavailable rather than guessing.
+
+## Optional live provider check
+
+Run `npm run check:providers` before a demo to perform a read-only BOCSAR compatibility check and, when `TFNSW_API_KEY` is configured, a read-only TfNSW route check. The normal test suite and CI remain deterministic and do not call live providers.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
