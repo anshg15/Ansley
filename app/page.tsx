@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 import { AnchorEditor } from "@/app/components/anchor-editor";
@@ -9,24 +9,45 @@ export default function Home() {
   const [propertyAddress, setPropertyAddress] = useState("");
   const [propertyError, setPropertyError] = useState("");
   const [showRoutine, setShowRoutine] = useState(false);
+  const propertyInputRef = useRef<HTMLInputElement>(null);
+  const routineSectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!showRoutine) {
+      return;
+    }
+
+    const frame = requestAnimationFrame(() => {
+      const section = routineSectionRef.current;
+
+      if (!section) {
+        return;
+      }
+
+      section.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+
+      section
+        .querySelector<HTMLInputElement>("input")
+        ?.focus({ preventScroll: true });
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [showRoutine]);
 
   function handlePropertySubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!propertyAddress.trim()) {
       setPropertyError("Enter the property address you want to decode.");
+      propertyInputRef.current?.focus();
       return;
     }
 
     setPropertyError("");
     setShowRoutine(true);
-
-    requestAnimationFrame(() => {
-      document.getElementById("routine")?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    });
   }
 
   return (
@@ -124,6 +145,7 @@ export default function Home() {
               </p>
 
               <input
+                ref={propertyInputRef}
                 id="property-address"
                 name="propertyAddress"
                 type="text"
@@ -197,6 +219,7 @@ export default function Home() {
 
       {showRoutine ? (
         <section
+          ref={routineSectionRef}
           id="routine"
           className="scroll-mt-6 border-t border-border bg-paper/40"
         >
