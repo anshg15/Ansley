@@ -24,11 +24,26 @@ function routeModeLabel(
   walkingMinutes: number,
   durationMinutes: number,
 ) {
+  if (
+    modes.length === 0 &&
+    walkingMinutes > 0 &&
+    walkingMinutes >= durationMinutes - 1
+  ) {
+    return "Walking";
+  }
+
+  const walkingShare =
+    durationMinutes > 0 ? walkingMinutes / durationMinutes : 0;
+
+  if (walkingShare >= 0.8) {
+    return "Mostly walking";
+  }
+
   if (modes.length > 0) {
     return modes.join(" + ");
   }
 
-  if (walkingMinutes > 0 && walkingMinutes >= durationMinutes - 1) {
+  if (walkingMinutes > 0) {
     return "Walking";
   }
 
@@ -50,6 +65,7 @@ export function AnalysisReport({ report }: AnalysisReportProps) {
 
           <h2
             id="analysis-report-heading"
+            tabIndex={-1}
             className="mt-3 max-w-3xl text-3xl font-semibold tracking-[-0.04em] sm:text-4xl"
           >
             How this address fits your week.
@@ -203,6 +219,7 @@ export function AnalysisReport({ report }: AnalysisReportProps) {
 
                 <div className="mt-6 border-t border-border pt-4 text-sm leading-6 text-muted-ink">
                   <span className="font-medium text-ink">
+                    Route mode:{" "}
                     {routeModeLabel(
                       anchor.route.modes,
                       anchor.route.walkingMinutes,

@@ -50,6 +50,25 @@ export default function Home() {
     return () => cancelAnimationFrame(frame);
   }, [showRoutine]);
 
+  useEffect(() => {
+    if (!analysisReport) {
+      return;
+    }
+
+    const frame = requestAnimationFrame(() => {
+      const heading = document.getElementById("analysis-report-heading");
+
+      heading?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+
+      heading?.focus({ preventScroll: true });
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [analysisReport]);
+
   async function handleAnalyse() {
     setAnalysisError("");
     setAnalysisReport(null);
