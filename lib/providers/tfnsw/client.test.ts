@@ -12,7 +12,14 @@ test("uses Stop Finder results to request and normalise a TfNSW trip", async () 
     requests.push(request);
     if (request.url.includes("stop_finder")) {
       const name = new URL(request.url).searchParams.get("name_sf");
-      return Response.json({ locations: [{ id: name === "Origin" ? "101" : "202", type: "stop" }] });
+      return Response.json({
+        locations: [
+          {
+            id: name === "Origin" ? "101" : "202",
+            type: name === "Origin" ? "singlehouse" : "poi",
+          },
+        ],
+      });
     }
     return Response.json(journeyFixture);
   };
@@ -30,6 +37,8 @@ test("uses Stop Finder results to request and normalise a TfNSW trip", async () 
     assert.equal(tripRequest?.headers.get("authorization"), "apikey test-key");
     assert.equal(new URL(tripRequest?.url).searchParams.get("name_origin"), "101");
     assert.equal(new URL(tripRequest?.url).searchParams.get("name_destination"), "202");
+    assert.equal(new URL(tripRequest?.url).searchParams.get("type_origin"), "any");
+    assert.equal(new URL(tripRequest?.url).searchParams.get("type_destination"), "any");
     assert.equal(new URL(tripRequests[1].url).searchParams.get("itdDate"), "20260831");
     assert.equal(new URL(tripRequests[1].url).searchParams.get("itdTime"), "1800");
     assert.equal(route.durationMinutes, 33);

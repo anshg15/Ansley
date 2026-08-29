@@ -94,9 +94,9 @@ export class TfnswClient {
       depArrMacro: "dep",
       itdDate: tripDeparture.date,
       itdTime: tripDeparture.time,
-      type_origin: origin.type,
+      type_origin: "any",
       name_origin: origin.id,
-      type_destination: destination.type,
+      type_destination: "any",
       name_destination: destination.id,
       TfNSWTR: "true",
     });
