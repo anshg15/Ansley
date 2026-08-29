@@ -35,7 +35,10 @@ function extractLocation(payload: unknown): TfnswLocation {
     throw new TfnswProviderError("TfNSW returned a location without an identifier.");
   }
   const rawType = location.type;
-  const type = typeof rawType === "string" && rawType.trim() ? rawType : "any";
+  // Stop Finder returns address-specific types such as `singlehouse`, while
+  // Trip Planner only accepts its generic `any` selector for those IDs.
+  // Preserve the two resolved types that Trip Planner accepts directly.
+  const type = rawType === "stop" || rawType === "poi" ? rawType : "any";
   return { id: String(id), type };
 }
 
