@@ -1,4 +1,12 @@
-import type { AnalysisRequest, Anchor, AnchorCategory, Coordinates, PropertyProfile } from "./analysis";
+import type {
+  AnalysisOptions,
+  AnalysisRequest,
+  Anchor,
+  AnchorCategory,
+  Coordinates,
+  PropertyProfile,
+  TimeLensPeriodId,
+} from "./analysis";
 
 const anchorCategories = new Set<AnchorCategory>([
   "work",
@@ -8,6 +16,7 @@ const anchorCategories = new Set<AnchorCategory>([
   "exercise",
   "other",
 ]);
+const timeLensPeriodIds = new Set<TimeLensPeriodId>(["weekday-morning", "weekday-evening"]);
 
 export class RequestValidationError extends Error {}
 
@@ -110,5 +119,42 @@ export function parseAnalysisRequest(value: unknown): AnalysisRequest {
     throw new RequestValidationError("Each anchor must have a unique id.");
   }
 
-  return { property: parseProperty(request.property), anchors };
+  return { property: parseProperty(request.property), anchors, ...(request.options === undefined ? {} : { options: parseOptions(request.options, anchors) }) };
+}
+
+function parseOptions(value: unknown, anchors: Anchor[]): AnalysisOptions {
+  if (!value || typeof value !== "object") {
+    throw new RequestValidationError("Analysis options must be an object.");
+  }
+
+  const options = value as Record<string, unknown>;
+  if (options.timeLens === undefined) return {};
+  if (typeof options.timeLens === "boolean") return { timeLens: options.timeLens };
+  if (!options.timeLens || typeof options.timeLens !== "object") {
+    throw new RequestValidationError("timeLens must be a boolean or configuration object.");
+  }
+
+  const timeLens = options.timeLens as Record<string, unknown>;
+  const anchorIds = parseStringList(timeLens.anchorIds, "TimeLens anchor ids", 2);
+  const periodIds = parseStringList(timeLens.periodIds, "TimeLens period ids", 2) as TimeLensPeriodId[] | undefined;
+  if (anchorIds && anchorIds.some((id) => !anchors.some((anchor) => anchor.id === id))) {
+    throw new RequestValidationError("TimeLens can only analyse anchors included in this request.");
+  }
+  if (periodIds && periodIds.some((id) => !timeLensPeriodIds.has(id))) {
+    throw new RequestValidationError("TimeLens contains an unsupported representative period.");
+  }
+
+  return { timeLens: { ...(anchorIds ? { anchorIds } : {}), ...(periodIds ? { periodIds } : {}) } };
+}
+
+function parseStringList(value: unknown, label: string, maxLength: number): string[] | undefined {
+  if (value === undefined) return undefined;
+  if (!Array.isArray(value) || value.length === 0 || value.length > maxLength || value.some((item) => typeof item !== "string" || !item.trim())) {
+    throw new RequestValidationError(`${label} must contain between one and ${maxLength} values.`);
+  }
+  const values = value.map((item) => (item as string).trim());
+  if (new Set(values).size !== values.length) {
+    throw new RequestValidationError(`${label} must not contain duplicates.`);
+  }
+  return values;
 }

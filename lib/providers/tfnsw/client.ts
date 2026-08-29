@@ -1,4 +1,4 @@
-import type { RouteAnalysis } from "@/lib/domain/analysis";
+import type { RepresentativeDeparture, RouteAnalysis } from "@/lib/domain/analysis";
 import { normaliseTfnswJourney } from "./normalise";
 
 const TFNSW_API_BASE_URL = "https://api.transport.nsw.gov.au/v1/tp";
@@ -63,24 +63,37 @@ function sydneyTripPlannerDateTime(now = new Date()) {
 }
 
 export class TfnswClient {
+  private readonly locations = new Map<string, Promise<TfnswLocation>>();
+
   constructor(
     private readonly fetcher: typeof fetch = fetch,
     private readonly baseUrl = TFNSW_API_BASE_URL,
   ) {}
 
   async analyseJourney(originAddress: string, destinationAddress: string, anchorId: string): Promise<RouteAnalysis> {
+    return this.analyseJourneyAt(originAddress, destinationAddress, anchorId);
+  }
+
+  async analyseJourneyAt(
+    originAddress: string,
+    destinationAddress: string,
+    anchorId: string,
+    departure?: RepresentativeDeparture,
+  ): Promise<RouteAnalysis> {
     const [origin, destination] = await Promise.all([
       this.findLocation(originAddress),
       this.findLocation(destinationAddress),
     ]);
 
-    const departure = sydneyTripPlannerDateTime();
+    const tripDeparture = departure
+      ? { date: departure.date.replaceAll("-", ""), time: departure.time.replace(":", "") }
+      : sydneyTripPlannerDateTime();
     const params = new URLSearchParams({
       outputFormat: "rapidJSON",
       coordOutputFormat: "EPSG:4326",
       depArrMacro: "dep",
-      itdDate: departure.date,
-      itdTime: departure.time,
+      itdDate: tripDeparture.date,
+      itdTime: tripDeparture.time,
       type_origin: origin.type,
       name_origin: origin.id,
       type_destination: destination.type,
@@ -92,6 +105,15 @@ export class TfnswClient {
   }
 
   private async findLocation(address: string) {
+    const existing = this.locations.get(address);
+    if (existing) return existing;
+
+    const location = this.requestLocation(address);
+    this.locations.set(address, location);
+    return location;
+  }
+
+  private async requestLocation(address: string) {
     const params = new URLSearchParams({
       outputFormat: "rapidJSON",
       type_sf: "any",

@@ -35,3 +35,14 @@ test("rejects duplicate anchors and invalid coordinates", () => {
     /outside valid geographic bounds/,
   );
 });
+
+test("accepts a capped TimeLens selection and rejects unknown anchors", () => {
+  assert.deepEqual(
+    parseAnalysisRequest({ ...validRequest, options: { timeLens: { anchorIds: ["uni"], periodIds: ["weekday-morning"] } } }).options,
+    { timeLens: { anchorIds: ["uni"], periodIds: ["weekday-morning"] } },
+  );
+  assert.throws(
+    () => parseAnalysisRequest({ ...validRequest, options: { timeLens: { anchorIds: ["unknown"] } } }),
+    /can only analyse anchors included/,
+  );
+});

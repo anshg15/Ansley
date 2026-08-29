@@ -24,6 +24,22 @@ export type Anchor = {
 export type AnalysisRequest = {
   property: PropertyProfile;
   anchors: Anchor[];
+  options?: AnalysisOptions;
+};
+
+export type TimeLensPeriodId = "weekday-morning" | "weekday-evening";
+
+export type AnalysisOptions = {
+  timeLens?: boolean | {
+    anchorIds?: string[];
+    periodIds?: TimeLensPeriodId[];
+  };
+};
+
+export type RepresentativeDeparture = {
+  date: string;
+  time: string;
+  timeZone: "Australia/Sydney";
 };
 
 export type RouteAnalysis = {
@@ -66,6 +82,36 @@ export type Insight = {
   severity: InsightSeverity;
 };
 
+export type TimeLensPeriod = {
+  id: TimeLensPeriodId;
+  label: string;
+  durationMinutes: number;
+};
+
+export type TimeLensResult = {
+  anchorId: string;
+  status: ModuleStatus;
+  periods: TimeLensPeriod[];
+  minDurationMinutes?: number;
+  maxDurationMinutes?: number;
+  variationMinutes?: number;
+  message?: string;
+};
+
+export type ShadowCommuteLevel = "low" | "medium" | "high";
+
+export type ShadowCommuteResult = {
+  anchorId: string;
+  level: ShadowCommuteLevel;
+  score: number;
+  reasons: string[];
+  backupRoute: {
+    status: ModuleStatus;
+    penaltyMinutes?: number;
+    message?: string;
+  };
+};
+
 export type ModuleStatus = "available" | "unavailable";
 
 export type AddressTruthReport = {
@@ -79,6 +125,8 @@ export type AddressTruthReport = {
   };
   routineFit: RoutineFit | null;
   insights: Insight[];
+  timeLens: TimeLensResult[];
+  shadowCommutes: ShadowCommuteResult[];
   modules: {
     transport: { status: ModuleStatus; message?: string };
     timeLens: { status: ModuleStatus; message?: string };
