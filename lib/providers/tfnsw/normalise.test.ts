@@ -51,3 +51,22 @@ test("uses the sum of leg durations when live TfNSW omits a journey summary dura
   assert.equal(route.durationMinutes, 18);
   assert.equal(route.walkingMinutes, 5);
 });
+
+
+test("recognises live TfNSW footpath legs as walking", () => {
+  const route = normaliseTfnswJourney({
+    journeys: [{
+      legs: [
+        { type: "footpath", duration: 420, distance: 520 },
+        { transportation: { product: { name: "Sydney Buses Network" } }, duration: 1200 },
+        { type: "footpath", duration: 360, distance: 430 },
+      ],
+    }],
+  }, "uni");
+
+  assert.equal(route.durationMinutes, 33);
+  assert.equal(route.walkingMinutes, 13);
+  assert.equal(route.walkingDistanceMetres, 950);
+  assert.equal(route.transfers, 0);
+  assert.deepEqual(route.modes, ["Sydney Buses Network"]);
+});
