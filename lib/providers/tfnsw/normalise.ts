@@ -93,7 +93,7 @@ function isWalkingLeg(leg: UnknownRecord) {
     getPath(leg, ["transportation", "product", "name"]),
     getPath(leg, ["transportation", "name"]),
   )?.toLowerCase();
-  return type === "walk" || type === "walking" || type === "foot";
+  return type === "walk" || type === "walking" || type === "foot" || type === "footpath";
 }
 
 function modeForLeg(leg: UnknownRecord) {
