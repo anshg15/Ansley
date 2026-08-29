@@ -52,7 +52,7 @@ export default function Home() {
 
           <h1 className="hero-title font-editorial max-w-4xl text-[clamp(3.4rem,6.1vw,6.1rem)] font-medium leading-[0.9] tracking-[-0.045em]">
             Decode your life
-            <span className="hero-gradient-text block italic">before you sign.</span>
+            <span className="hero-gradient-text mt-[5px] block italic">before you sign.</span>
           </h1>
 
           <p className="mt-8 max-w-2xl text-base leading-7 text-muted-ink sm:text-lg sm:leading-8 lg:max-w-2xl">
