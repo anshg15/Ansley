@@ -7,7 +7,7 @@
   --moss: #0b735f;
   --moss-deep: #062f27;
   --aqua: #137f91;
-  --fade-emerald: #008268;
+  --fade-emerald: #00a884;
   --fade-cyan: #8ae6ff;
   --transit-coral: #ed6a49;
   --muted-blue: #628f98;
@@ -111,8 +111,8 @@ select {
   pointer-events: none;
   content: "";
   background-image:
-    radial-gradient(ellipse 46rem 34rem at 100% 0%, #008268a8 0%, #0082688c 22%, #8ae6ff78 46%, transparent 76%),
-    radial-gradient(ellipse 48rem 38rem at 0% 100%, #0082689e 0%, #00826880 24%, #8ae6ff80 50%, transparent 78%);
+    radial-gradient(ellipse 46rem 34rem at 100% 0%, #00a884a8 0%, #00a8848c 22%, #8ae6ff78 46%, transparent 76%),
+    radial-gradient(ellipse 48rem 38rem at 0% 100%, #00a8849e 0%, #00a88480 24%, #8ae6ff80 50%, transparent 78%);
   filter: blur(10px);
   opacity: 0.82;
   transform: scale(1.02);
