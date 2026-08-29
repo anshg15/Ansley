@@ -7,6 +7,7 @@ import {
   AnchorEditor,
   type AnchorDraft,
 } from "@/app/components/anchor-editor";
+import { AnalysisReport } from "@/app/components/analysis-report";
 import type {
   AddressTruthReport,
   AnalysisRequest,
@@ -348,19 +349,7 @@ export default function Home() {
               ) : null}
 
               {analysisReport ? (
-                <div
-                  role="status"
-                  className="mt-5 border border-border bg-paper p-4 sm:ml-auto sm:max-w-md"
-                >
-                  <p className="font-mono text-xs uppercase tracking-[0.14em] text-moss">
-                    Analysis complete
-                  </p>
-                  <p className="mt-2 text-sm leading-6 text-muted-ink">
-                    {analysisReport.summary.analysedAnchors} destinations
-                    analysed · {analysisReport.summary.weeklyTravelHours} hours
-                    of weekly travel
-                  </p>
-                </div>
+                <AnalysisReport report={analysisReport} />
               ) : null}
             </div>
           </div>
