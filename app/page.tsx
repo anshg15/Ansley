@@ -1,4 +1,6 @@
 import Link from "next/link";
+import Image from "next/image";
+import favicon from "@/app/favicon.png";
 import { MotionStory } from "@/components/marketing/motion-story";
 import { OnboardingFlow } from "@/components/onboarding/onboarding-flow";
 import { CheckIcon, ClockIcon, RouteIcon, SparkIcon, ArrowRightIcon } from "@/components/ui/icons";
@@ -13,7 +15,13 @@ export default function Home() {
               aria-hidden="true"
               className="grid h-9 w-9 place-items-center rounded-full border border-moss/40 bg-paper shadow-[0_5px_16px_rgba(23,35,29,0.04)]"
             >
-              <span className="h-2.5 w-2.5 rounded-full bg-transit-coral transition-transform duration-200 group-hover:scale-125" />
+              <Image
+                src={favicon}
+                alt=""
+                width={36}
+                height={36}
+                className="h-full w-full rounded-full object-cover transition-transform duration-200 group-hover:scale-105"
+              />
             </span>
             <span>
               <span className="block font-mono text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-muted-ink">
