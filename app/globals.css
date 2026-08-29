@@ -1,19 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  --parchment: #f5f1e8;
+  --parchment: #f6f0e6;
   --paper: #fffdf8;
-  --ink: #17231d;
-  --moss: #426957;
-  --moss-deep: #29483c;
-  --transit-coral: #d96b48;
-  --muted-blue: #6f9da3;
-  --amber: #b77a2a;
+  --ink: #10271f;
+  --moss: #0b735f;
+  --moss-deep: #062f27;
+  --aqua: #137f91;
+  --transit-coral: #ed6a49;
+  --muted-blue: #628f98;
+  --amber: #a86a19;
   --danger: #963f30;
-  --focus: #205f69;
-  --border: #d8d3c8;
-  --border-strong: #bbb5a9;
-  --muted-ink: #657069;
+  --focus: #137f91;
+  --border: #d8d0c3;
+  --border-strong: #b7afa1;
+  --muted-ink: #5d6963;
   --background: var(--parchment);
   --foreground: var(--ink);
 }
@@ -26,6 +27,7 @@
   --color-ink: var(--ink);
   --color-moss: var(--moss);
   --color-moss-deep: var(--moss-deep);
+  --color-aqua: var(--aqua);
   --color-transit-coral: var(--transit-coral);
   --color-muted-blue: var(--muted-blue);
   --color-amber: var(--amber);
@@ -83,6 +85,122 @@ select {
 
 .font-editorial {
   font-family: var(--font-newsreader), Georgia, serif;
+}
+
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 90%, transparent);
+  background: color-mix(in srgb, var(--parchment) 91%, transparent);
+  backdrop-filter: blur(14px);
+}
+
+.desktop-only {
+  display: none;
+}
+
+.mobile-only {
+  display: flex;
+}
+
+@media (min-width: 768px) {
+  .desktop-only {
+    display: flex;
+  }
+
+  .mobile-only {
+    display: none;
+  }
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--moss);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.17em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.eyebrow-line {
+  display: inline-block;
+  height: 1px;
+  width: 2rem;
+  flex: 0 0 auto;
+  background: currentColor;
+}
+
+.hero-title {
+  text-wrap: balance;
+}
+
+.hero-gradient-text {
+  color: var(--moss);
+  background-image: linear-gradient(102deg, #137f91 0%, #0b806a 38%, #0a5c4b 68%, #062f27 100%);
+  background-position: 18% 50%;
+  background-size: 140% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-sweep 1.35s cubic-bezier(0.2, 0.75, 0.25, 1) both;
+  transition: background-position 380ms ease-out;
+}
+
+.hero-section:has(.hero-cta:hover) .hero-gradient-text,
+.hero-section:has(.hero-cta:focus-visible) .hero-gradient-text {
+  background-position: 100% 50%;
+}
+
+.button-large {
+  min-height: 3.5rem;
+  padding-inline: 1.35rem;
+}
+
+.button-inverse {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border: 1px solid rgba(255, 253, 248, 0.42);
+  border-radius: 2px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 0.875rem;
+  font-weight: 650;
+  transition: transform 180ms ease, background-color 180ms ease, border-color 180ms ease;
+}
+
+.button-inverse:hover {
+  transform: translateY(-1px);
+  border-color: var(--transit-coral);
+  background: var(--transit-coral);
+}
+
+.carousel-button {
+  display: grid;
+  height: 2.75rem;
+  width: 2.75rem;
+  place-items: center;
+  border: 1px solid var(--border-strong);
+  background: var(--paper);
+  color: var(--ink);
+  transition: transform 180ms ease, border-color 180ms ease, background-color 180ms ease;
+}
+
+.carousel-button:hover {
+  transform: translateY(-2px);
+  border-color: var(--moss);
+  background: var(--moss);
+  color: var(--paper);
+}
+
+.marquee-track {
+  animation: marquee 28s linear infinite;
 }
 
 .surface-paper {
@@ -194,6 +312,36 @@ fieldset .grid.grid-cols-2 {
   opacity: 0.48;
 }
 
+@media (max-width: 767px) {
+  .button-primary.desktop-only {
+    display: none;
+  }
+
+  .button-primary.mobile-only {
+    display: flex;
+  }
+}
+
+@media (min-width: 768px) {
+  .button-primary.desktop-only {
+    display: flex;
+  }
+
+  .button-primary.mobile-only {
+    display: none;
+  }
+}
+
+@keyframes gradient-sweep {
+  from { background-position: 100% 50%; }
+  to { background-position: 18% 50%; }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -205,5 +353,10 @@ fieldset .grid.grid-cols-2 {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .hero-gradient-text,
+  .marquee-track {
+    animation: none;
   }
 }
