@@ -1,22 +1,26 @@
 @import "tailwindcss";
 
 :root {
-  --parchment: #f5f1e8;
+  --parchment: #f6f1eb;
   --paper: #fffdf8;
-  --ink: #16271f;
+  --ink: #06251f;
+  --cyan: #31c3cf;
+  --teal: #0f8f7a;
+  --forest: #075846;
+  --black-green: #001d18;
   --moss: #426957;
   --moss-deep: #29483c;
-  --emerald-deep: #123d31;
-  --emerald-mid: #24624d;
-  --emerald-lift: #4f8069;
+  --emerald-deep: var(--forest);
+  --emerald-mid: var(--teal);
+  --emerald-lift: var(--cyan);
   --transit-coral: #d96b48;
   --muted-blue: #6f9da3;
   --amber: #b77a2a;
   --danger: #963f30;
-  --focus: #205f69;
-  --border: #d8d3c8;
-  --border-strong: #bbb5a9;
-  --muted-ink: #5c6962;
+  --focus: #0f7f75;
+  --border: #d7d4cb;
+  --border-strong: #b9b8ad;
+  --muted-ink: #53665f;
   --background: var(--parchment);
   --foreground: var(--ink);
 }
@@ -27,6 +31,10 @@
   --color-parchment: var(--parchment);
   --color-paper: var(--paper);
   --color-ink: var(--ink);
+  --color-cyan: var(--cyan);
+  --color-teal: var(--teal);
+  --color-forest: var(--forest);
+  --color-black-green: var(--black-green);
   --color-moss: var(--moss);
   --color-moss-deep: var(--moss-deep);
   --color-emerald-deep: var(--emerald-deep);
@@ -57,11 +65,12 @@ body {
   min-height: 100vh;
   margin: 0;
   background:
-    linear-gradient(rgba(18, 61, 49, 0.026) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(18, 61, 49, 0.026) 1px, transparent 1px),
-    radial-gradient(circle at 16% 28%, rgba(79, 128, 105, 0.055), transparent 27rem),
+    linear-gradient(rgba(7, 88, 70, 0.024) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(7, 88, 70, 0.024) 1px, transparent 1px),
+    radial-gradient(circle at 14% 24%, rgba(49, 195, 207, 0.075), transparent 24rem),
+    radial-gradient(circle at 74% 22%, rgba(15, 143, 122, 0.045), transparent 28rem),
     var(--parchment);
-  background-size: 36px 36px, 36px 36px, auto, auto;
+  background-size: 36px 36px, 36px 36px, auto, auto, auto;
   color: var(--ink);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
@@ -79,7 +88,7 @@ select {
 }
 
 ::selection {
-  background: var(--emerald-deep);
+  background: var(--teal);
   color: var(--paper);
 }
 
@@ -97,9 +106,15 @@ select {
   text-shadow: 0 1px 0 rgba(255, 253, 248, 0.45);
 }
 
-.hero-gradient {
-  color: var(--moss);
-  background: linear-gradient(105deg, var(--emerald-deep) 0%, var(--emerald-mid) 45%, var(--emerald-lift) 100%);
+.hero-spectrum {
+  color: var(--forest);
+  background: linear-gradient(
+    96deg,
+    var(--black-green) 0%,
+    var(--forest) 30%,
+    var(--teal) 63%,
+    var(--cyan) 100%
+  );
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -108,8 +123,8 @@ select {
 .surface-paper {
   background: color-mix(in srgb, var(--paper) 97%, transparent);
   box-shadow:
-    0 28px 76px rgba(18, 61, 49, 0.09),
-    0 5px 18px rgba(23, 35, 29, 0.035);
+    0 30px 82px rgba(0, 29, 24, 0.11),
+    0 5px 18px rgba(6, 37, 31, 0.035);
 }
 
 .analysis-shell {
@@ -123,8 +138,8 @@ select {
   inset: 0 0 auto;
   height: 3px;
   z-index: 2;
-  background: linear-gradient(90deg, var(--emerald-deep), var(--moss), var(--transit-coral));
-  opacity: 0.95;
+  background: linear-gradient(90deg, var(--cyan), var(--teal), var(--forest), var(--black-green));
+  opacity: 0.98;
 }
 
 .route-rule {
@@ -148,7 +163,7 @@ select {
   top: calc(50% - 4px);
   width: 9px;
   height: 9px;
-  border: 2px solid var(--moss);
+  border: 2px solid var(--teal);
   border-radius: 999px;
   background: var(--paper);
 }
@@ -174,8 +189,8 @@ select {
 }
 
 .form-control:focus {
-  border-color: var(--emerald-mid);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--emerald-mid) 12%, transparent);
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cyan) 16%, transparent);
 }
 
 .form-control[aria-invalid="true"] {
@@ -201,28 +216,28 @@ fieldset .grid.grid-cols-2 {
 }
 
 .button-primary {
-  border: 1px solid var(--emerald-deep);
-  background: var(--emerald-deep);
+  border: 1px solid var(--black-green);
+  background: linear-gradient(100deg, var(--forest), var(--black-green));
   color: var(--paper);
-  box-shadow: 0 8px 18px rgba(18, 61, 49, 0.08);
+  box-shadow: 0 8px 18px rgba(0, 29, 24, 0.11);
 }
 
 .button-primary:hover {
   transform: translateY(-1px);
-  background: var(--emerald-mid);
-  border-color: var(--emerald-mid);
-  box-shadow: 0 12px 24px rgba(18, 61, 49, 0.12);
+  background: linear-gradient(100deg, var(--teal), var(--forest));
+  border-color: var(--forest);
+  box-shadow: 0 12px 25px rgba(0, 29, 24, 0.16);
 }
 
 .button-secondary {
   border: 1px solid var(--border-strong);
-  background: color-mix(in srgb, var(--paper) 70%, transparent);
+  background: color-mix(in srgb, var(--paper) 72%, transparent);
   color: var(--ink);
 }
 
 .button-secondary:hover {
   transform: translateY(-1px);
-  border-color: var(--emerald-mid);
+  border-color: var(--teal);
   background: var(--paper);
 }
 
@@ -235,11 +250,11 @@ fieldset .grid.grid-cols-2 {
 
 @media (max-width: 639px) {
   .hero-heading {
-    max-width: 6.6ch;
+    max-width: 7.2ch;
   }
 
-  .hero-gradient {
-    background: linear-gradient(105deg, var(--emerald-deep), var(--emerald-lift));
+  .hero-spectrum {
+    background: linear-gradient(96deg, var(--black-green), var(--forest) 42%, var(--teal) 78%, var(--cyan));
     -webkit-background-clip: text;
     background-clip: text;
   }
