@@ -5,15 +5,15 @@
   --paper: #fffdf8;
   --ink: #17231d;
   --moss: #426957;
+  --moss-deep: #29483c;
   --transit-coral: #d96b48;
   --muted-blue: #6f9da3;
   --amber: #b77a2a;
   --danger: #963f30;
   --focus: #205f69;
-
   --border: #d8d3c8;
+  --border-strong: #bbb5a9;
   --muted-ink: #657069;
-
   --background: var(--parchment);
   --foreground: var(--ink);
 }
@@ -21,20 +21,21 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-
   --color-parchment: var(--parchment);
   --color-paper: var(--paper);
   --color-ink: var(--ink);
   --color-moss: var(--moss);
+  --color-moss-deep: var(--moss-deep);
   --color-transit-coral: var(--transit-coral);
   --color-muted-blue: var(--muted-blue);
   --color-amber: var(--amber);
   --color-danger: var(--danger);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-muted-ink: var(--muted-ink);
-
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-editorial: var(--font-newsreader);
 }
 
 * {
@@ -43,12 +44,17 @@
 
 html {
   background: var(--parchment);
+  scroll-behavior: smooth;
 }
 
 body {
   min-height: 100vh;
   margin: 0;
-  background: var(--parchment);
+  background:
+    linear-gradient(rgba(23, 35, 29, 0.026) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(23, 35, 29, 0.026) 1px, transparent 1px),
+    var(--parchment);
+  background-size: 36px 36px;
   color: var(--ink);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
@@ -75,32 +81,70 @@ select {
   outline-offset: 3px;
 }
 
+.font-editorial {
+  font-family: var(--font-newsreader), Georgia, serif;
+}
+
+.surface-paper {
+  background: color-mix(in srgb, var(--paper) 97%, transparent);
+  box-shadow: 0 24px 70px rgba(23, 35, 29, 0.07);
+}
+
+.route-rule {
+  position: relative;
+}
+
+.route-rule::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--border);
+}
+
+.route-rule::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: calc(50% - 4px);
+  width: 9px;
+  height: 9px;
+  border: 2px solid var(--moss);
+  border-radius: 999px;
+  background: var(--paper);
+}
+
 .form-control {
   width: 100%;
   border: 1px solid var(--border);
+  border-radius: 2px;
   background: var(--paper);
-  padding: 0.875rem 1rem;
+  padding: 0.9rem 1rem;
   color: var(--ink);
-  font-size: 1rem;
+  font-size: 0.95rem;
   outline: none;
-  transition: border-color 150ms ease;
+  transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
 }
 
 .form-control::placeholder {
-  color: color-mix(in srgb, var(--muted-ink) 60%, transparent);
+  color: color-mix(in srgb, var(--muted-ink) 58%, transparent);
+}
+
+.form-control:hover {
+  border-color: var(--border-strong);
 }
 
 .form-control:focus {
   border-color: var(--moss);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--moss) 12%, transparent);
 }
 
 .form-control[aria-invalid="true"] {
   border-color: var(--danger);
 }
 
-/* A destination card is already two columns at tablet/desktop widths. Keep its
-   two numeric controls vertically paired so their labels never compete for the
-   same narrow column (for example: “Visits/weekMax minutes”). */
 fieldset .grid.grid-cols-2 {
   grid-template-columns: minmax(0, 1fr);
 }
@@ -108,13 +152,15 @@ fieldset .grid.grid-cols-2 {
 .button-primary,
 .button-secondary {
   display: flex;
+  min-height: 3.25rem;
   align-items: center;
   justify-content: space-between;
-  min-height: 3.25rem;
-  padding: 0.875rem 1.25rem;
+  gap: 1rem;
+  border-radius: 2px;
+  padding: 0.875rem 1.2rem;
   font-size: 0.875rem;
-  font-weight: 600;
-  transition: opacity 150ms ease, background-color 150ms ease;
+  font-weight: 650;
+  transition: transform 150ms ease, opacity 150ms ease, background-color 150ms ease, border-color 150ms ease;
 }
 
 .button-primary {
@@ -124,15 +170,40 @@ fieldset .grid.grid-cols-2 {
 }
 
 .button-primary:hover {
-  opacity: 0.9;
+  transform: translateY(-1px);
+  background: var(--moss-deep);
+  border-color: var(--moss-deep);
 }
 
 .button-secondary {
-  border: 1px solid var(--border);
-  background: transparent;
+  border: 1px solid var(--border-strong);
+  background: color-mix(in srgb, var(--paper) 65%, transparent);
   color: var(--ink);
 }
 
 .button-secondary:hover {
-  background: var(--parchment);
+  transform: translateY(-1px);
+  border-color: var(--moss);
+  background: var(--paper);
+}
+
+.button-primary:disabled,
+.button-secondary:disabled {
+  cursor: not-allowed;
+  transform: none;
+  opacity: 0.48;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
