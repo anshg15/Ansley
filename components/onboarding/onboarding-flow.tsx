@@ -287,7 +287,7 @@ export function OnboardingFlow() {
             aria-invalid={Boolean(propertyError)}
           />
           <FieldError message={propertyError} />
-          <button className="button-primary mt-5 w-full" type="submit">Continue to your routine <span aria-hidden="true">→</span></button>
+          <button className="button-primary hero-cta mt-5 w-full" type="submit">Continue to your routine <span aria-hidden="true">→</span></button>
         </form>
 
         <div className="my-5 flex items-center gap-3" aria-hidden="true">
