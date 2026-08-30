@@ -1,99 +1,190 @@
 # Decoded — under-three-minute showcase demo
 
-**Target length:** 2 minutes 35–55 seconds.
-**Story:** A rental can look good on paper but still make a person's actual week difficult. Decoded turns a property address and a person's regular places into a clear, evidence-led decision.
+**Target:** approximately 2 minutes 35–45 seconds of spoken demo, leaving buffer for clicks and live loading.
 
-This script is designed for the latest UI-improve experience: the calm editorial address-and-routine flow, live TfNSW route analysis, Routine Fit, weekly-travel summary, the **Why this score** explanation, the **Where your week goes** chart, TimeLens, and ShadowCommute.
+**Core story:** A rental can look good on paper while making the renter's actual week difficult. Decoded tests a potential home against the places that shape that person's life and turns real transport journeys into a clear, explainable decision.
 
-## Before you start
+## Before recording
 
-- Open the app at the address-entry screen and keep the saved demo available as a one-click backup.
-- For a live run, use a normal, fully written address and add one to three destinations. A dependable example is:
-  - Potential property: `1 King Street, Newtown NSW 2042`
-  - University: `University of Sydney, Camperdown NSW` — 4 visits/week — 30 minutes
-  - City work: `Martin Place, Sydney NSW` — 3 visits/week — 40 minutes
-- The maximum is a **one-way total travel-time limit**, including public transport and walking. It is not walking-only and is not a return-trip limit.
-- Live journey durations may change. When presenting live data, read the numbers currently on screen instead of promising a fixed score. If the provider is slow or unavailable, use **Try the saved demo**; its results are explicitly labelled as a saved snapshot, not live data.
-- Speak at a calm pace and pause briefly after the main report appears. The core script is about 360 spoken words: roughly 2 minutes 25 seconds at a natural pace, leaving useful room for clicks and pauses while staying under three minutes.
+- Open Decoded on the address-entry screen.
+- Keep **Try the saved demo** available as the backup.
+- For the live walkthrough, use:
+  - Potential property: `42 King Street, Newtown NSW`
+  - University: `University of Sydney, Camperdown NSW` — 4 visits/week — 30-minute limit
+  - City work: `Martin Place, Sydney NSW` — 3 visits/week — 40-minute limit
+- The maximum travel time is a **one-way total journey limit**, including walking and public transport.
+- Live TfNSW journey times can change. Always read the values currently on screen rather than promising a fixed score.
+- Use two destinations in the recorded demo. The product supports up to four, but adding more does not strengthen the three-minute story.
+- Pause briefly when the report appears. The report reveal is the payoff.
+
+---
 
 ## Run of show
 
-### 0:00–0:18 — Start with the human problem
+### 0:00–0:18 — The problem
 
-**Show:** The address-entry screen.
+**Show:** Landing screen with the Decoded headline visible.
 
 **Say:**
 
-> Rental listings tell us the rent and bedrooms. But before signing a lease, the real question is: can I actually live my life from this address? Will university, work and essentials still be reachable every week?
+> Rental listings tell you the rent, bedrooms and location. But they do not tell you whether that address actually works for your life.
+>
+> A place can look perfect on paper, then leave you spending hours every week getting to university, work, the gym, or the people you see regularly.
 
-### 0:18–0:38 — Introduce Decoded
+---
+
+### 0:18–0:35 — Introduce Decoded
 
 **Show:** Enter the potential property address.
 
 **Say:**
 
-> This is Decoded. It starts with a potential home, then the places that shape *your* week. Instead of asking whether a suburb is generally good, it asks whether this exact address works for this person.
+> Decoded helps renters test that before signing. You enter a potential home, then the destinations that shape your actual week.
+>
+> Instead of asking whether a suburb is generally good, Decoded asks whether this exact address works for this person.
 
-### 0:38–1:03 — Make the input feel personal and easy
+---
 
-**Show:** Add University and City work. Point out the visits-per-week and maximum-travel-time fields; add a gym if time permits.
+### 0:35–0:58 — Build the personal routine
 
-**Say:**
-
-> Here I add university four times a week and city work three times a week. For each place, I choose frequency and the longest one-way journey I would consider reasonable. The helper text makes it clear that this is the *total* journey, including walking and public transport. The input stays small, personal and realistic.
-
-### 1:03–1:30 — Reveal a useful, trustworthy answer
-
-**Show:** Click analyse, then let the report settle on the summary cards.
+**Show:** Add University and City work. Point to visits per week and maximum one-way travel time.
 
 **Say:**
 
-> Decoded checks the journeys using TfNSW transport data and turns them into an answer a renter can act on. Routine Fit is not a mysterious score: it is the share of regular weekly visits within the limits chosen. We also show estimated weekly return-travel time and the number of destinations assessed.
+> For each destination, I add how often I go there and the longest one-way journey I would personally accept.
+>
+> So this is not a generic suburb score. Two people can analyse the same property and get completely different answers because their lives are different.
 
-### 1:30–1:52 — Explain *why* the result is what it is
+---
 
-**Show:** The **Why this score** card and **Where your week goes** chart.
+### 0:58–1:20 — Reveal the result
 
-**Say:**
-
-> The explanation makes the result auditable: how many visits fit, weighted by how often each place matters. This chart shows where the time goes. The largest bar is the journey quietly taking the biggest share of the week, so the trade-off is visible before moving.
-
-### 1:52–2:12 — Demonstrate depth without losing clarity
-
-**Show:** Scroll to TimeLens and ShadowCommute.
+**Show:** Review the routine, click analyse, then pause when the report appears.
 
 **Say:**
 
-> We go beyond a single fastest route. TimeLens compares representative travel times, while ShadowCommute surfaces route fragility—where the routine can become harder if the usual option is disrupted. The first answer remains simple.
+> Decoded checks those journeys using live Transport for NSW data, then turns them into a personalised decision report.
+>
+> The headline result is Routine Fit: the percentage of your regular weekly visits that fall inside the travel limits you chose.
 
-### 2:12–2:38 — Close on impact and judging value
+**Presenter:** Read the **actual Routine Fit shown on screen**. Do not script a fixed live percentage.
 
-**Show:** Return to the verdict or report headline.
+---
+
+### 1:20–1:45 — Make the score trustworthy
+
+**Show:** Routine Fit, **Why this score**, and weekly travel summary.
 
 **Say:**
 
-> Decoded supports a high-stakes rental decision with a person's real routine in mind. It connects home, education, work, health and community to one address using real transport data and transparent calculations. Rather than discovering an unsustainable commute after signing, a renter can see the trade-offs early and choose a home that supports their life.
+> And it is deliberately explainable. A destination you visit five times a week matters more than one you visit once, so Routine Fit is frequency-weighted rather than an arbitrary black-box score.
+>
+> We also calculate the estimated return-travel burden across the whole week, so you can see the cost of an address in time, not just distance.
 
-## If you use the saved-demo backup
+---
 
-Keep the same script, but replace the live-data sentence at 1:03 with this:
+### 1:45–2:05 — Show where the week goes
 
-> To make the walkthrough reliable, I am using a saved TfNSW demo snapshot. It is clearly labelled as saved data; the product never presents it as a live route. The same report shows a 67% Routine Fit, 7 hours 8 minutes of estimated weekly return travel, and three destinations analysed.
+**Show:** **Where your week goes** and the individual journey cards.
 
-That transparency is a strength: the demo still shows the complete experience while being honest about its data source.
+**Say:**
 
-## How this meets the judging criteria
+> Here we can see exactly where that time goes. Each journey shows the one-way duration, walking, transfers and whether it fits the renter's own limit.
+>
+> Instead of discovering after moving that one regular trip dominates your week, the trade-off is visible before you sign.
 
-| Criterion | Evidence to make explicit in the demo |
+---
+
+### 2:05–2:25 — TimeLens and ShadowCommute
+
+**Show:** TimeLens and ShadowCommute.
+
+**Say:**
+
+> We also avoid pretending that one fastest route tells the whole story. TimeLens compares representative travel periods, while ShadowCommute highlights route complexity and resilience.
+>
+> These are transparent signals, not predictions. We show what the available transport evidence supports and clearly label anything unavailable.
+
+---
+
+### 2:25–2:43 — Technical credibility
+
+**Show:** Stay on the report. There is no need to switch to code.
+
+**Say:**
+
+> Underneath, TfNSW responses are normalised server-side into our own domain model, and the report is generated through deterministic calculations rather than invented AI scoring.
+>
+> We also preserve successful journeys when individual routes fail instead of hiding uncertainty.
+
+---
+
+### 2:43–2:55 — Close on the decision
+
+**Show:** Return to the main verdict or report headline.
+
+**Say:**
+
+> Decoded turns a rental address into a question that is actually personal:
+>
+> **Does this home fit the life I already have?**
+>
+> Decode your life before you sign.
+
+---
+
+## Saved-demo backup
+
+If the live TfNSW request is slow or unavailable, switch immediately to **Try the saved demo**.
+
+**Say:**
+
+> To keep the walkthrough reliable, I'm switching to a saved TfNSW analysis. It is explicitly labelled as saved data rather than live data, but it runs through the same Decoded report experience.
+
+Then continue from the report section of the normal script.
+
+The saved snapshot currently demonstrates:
+
+- **67% Routine Fit**
+- **7h 8m** estimated weekly return travel
+- **3 destinations analysed**
+- TimeLens
+- ShadowCommute
+- weekly travel burden
+- deterministic insights
+
+Do not apologise for using the fallback. The explicit source labelling demonstrates that Decoded distinguishes live data from saved evidence rather than pretending a failed provider call succeeded.
+
+---
+
+## Judging points to make visible
+
+| Judging signal | What Decoded demonstrates |
 | --- | --- |
-| **Idea — 15 points** | A realistic, high-stakes problem: listings omit whether a home works for the renter's actual life. Decoded makes that decision personal through places, visit frequency and chosen limits. |
-| **Implementation — 30 points** | TfNSW journey data is normalised server-side into deterministic, frequency-weighted scores, weekly return-travel estimates and route-level insights. The live run—and honest saved-data fallback—demonstrates a functional end-to-end product. |
-| **Design — 15 points** | The refined emerald editorial identity, clear two-step flow, helper copy, concise report cards and progressive detail make an information-heavy decision understandable and accessible. |
-| **Pitch — 10 points** | Open on the renter's human problem, prove the answer with a live personal routine, explain the trade-off, then end on the life impact—not the technology. |
+| **Problem / idea** | Rental listings describe the property but not whether it fits the renter's actual weekly routine. |
+| **Personalisation** | The renter chooses the destinations, visit frequency and travel limits that matter to them. |
+| **Implementation** | Live TfNSW journeys are normalised server-side before entering Decoded's provider-independent domain and analysis layers. |
+| **Explainability** | Routine Fit is deterministic, frequency-weighted and compared directly against user-defined limits. |
+| **Depth** | Weekly burden, TimeLens, ShadowCommute and route-level evidence add context without hiding the simple headline answer. |
+| **Reliability** | Partial failures preserve successful journeys, unavailable modules are labelled honestly, and a saved demo is never presented as live data. |
+| **Design** | The report progressively reveals detail while keeping Routine Fit and the weekly-life trade-off visually dominant. |
+| **Impact** | A renter can identify an unsustainable routine before signing a lease rather than after moving in. |
+
+---
 
 ## Presenter reminders
 
-- Do not spend time typing on camera if it feels slow—have the form prefilled, then briefly change one field to show that it is personalised.
-- Read the actual report values aloud. Do not claim a score or journey time you cannot see.
-- Avoid technical implementation jargon unless asked. If a judge asks, explain that journeys are normalised server-side and the score is a deterministic, frequency-weighted comparison against the renter's stated limits.
-- Finish on the decision, not the technology: **"Decoded helps people choose a home that fits the life they already have."**
+- Do not spend the video typing three or four destinations. Two is enough to prove personalisation.
+- Have addresses ready to paste if necessary.
+- Read live journey values from the screen.
+- Do not claim groceries, listing ingestion or other deferred features.
+- Do not describe ShadowCommute as disruption prediction.
+- Do not describe Decoded as deciding whether a suburb is objectively good or safe.
+- If technical implementation comes up, explain:
+  - external provider data is normalised server-side;
+  - the analysis layer operates on Decoded-owned domain models;
+  - Routine Fit is deterministic and frequency-weighted;
+  - provider failures are represented explicitly.
+- Finish on the renter's decision, not the technology:
+
+> **Decoded helps people choose a home that fits the life they already have.**
