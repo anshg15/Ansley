@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createAnalysePostHandler, POST } from "./route";
+import { createAnalysePostHandler } from "@/lib/analysis/analyse-post-handler";
+import { POST } from "./route";
 
 const requestBody = {
   property: { address: "1 King Street, Newtown NSW", localGovernmentArea: "Inner West" },
